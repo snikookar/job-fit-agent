@@ -168,7 +168,7 @@ def parse_requirements(ctx: dict[str, Any]) -> dict[str, Any]:
     first_line = next((ln.strip("# ").strip() for ln in lines if ln.strip()), "Untitled position")
     company = ctx.get("company_hint")
     if not company:
-        m = re.search(r"\b(?:at|join|About)\s+([A-Z][\w&.\-]+(?:\s+[A-Z][\w&.\-]+){0,3})", text)
+        m = re.search(r"\b(?:at|join|About)[ \t]+([A-Z][\w&.\-]+(?:[ \t]+[A-Z][\w&.\-]+){0,3})", text)
         company = m.group(1) if m else None
     location = ctx.get("location_hint")
     if not location:
@@ -278,3 +278,135 @@ def gap_suggestions(ctx: dict[str, Any]) -> dict[str, Any]:
             )
         items.append({"requirement_id": g["requirement_id"], "suggestion": text})
     return {"items": items}
+
+
+# --- write_draft ----------------------------------------------------------------------
+
+_PAST_VERBS = {"built", "led", "ran", "wrote", "made", "set", "took", "drove", "grew", "won", "taught"}
+
+
+def _clean_quote(text: str) -> str:
+    text = " ".join(line.strip().lstrip("-*• ").strip() for line in text.splitlines() if line.strip())
+    return text if text.endswith((".", "!", "?")) else text + "."
+
+
+def _first_person(quote: str) -> str:
+    first = quote.split()[0].lower() if quote.split() else ""
+    if first.endswith("ed") or first in _PAST_VERBS:
+        return f"In my work, I {quote[0].lower()}{quote[1:]}"
+    return f"My profile includes this: {quote}"
+
+
+@handler("write_draft")
+def write_draft(ctx: dict[str, Any]) -> dict[str, Any]:
+    from jobfit.schemas import JOB_EVIDENCE_ID
+
+    if ctx.get("revision") and ctx.get("previous_draft"):
+        # Revision: the heuristic can't rewrite, so it deletes what the judge flagged.
+        bad = {(v["section"], v["index"]) for v in ctx.get("verdicts") or [] if not v["supported"]}
+        prev = ctx["previous_draft"]
+        return {
+            section: [s for i, s in enumerate(prev[section]) if (section, i) not in bad]
+            for section in ("bullets", "cover_letter")
+        }
+
+    pool = ctx["pool"]
+    job = ctx["job"]
+    company = job.get("company") or "your company"
+
+    # Bullets: the strongest evidence, resume bullets first, reused nearly verbatim.
+    # Achievement bullets from the experience section beat skill lists and README text.
+    ranked = sorted(
+        pool,
+        key=lambda e: (
+            not e.get("section", "").startswith("Experience"),
+            not e.get("source", "").startswith("resume"),
+            -e["strength"],
+        ),
+    )
+    bullets = [
+        {"text": _clean_quote(e["quote"]), "evidence_ids": [e["chunk_id"]]}
+        for e in ranked[:6]
+    ]
+
+    letter = [
+        {"text": f"I am applying for the {job['title']} position at {company}.", "evidence_ids": [JOB_EVIDENCE_ID]}
+    ]
+    for e in ranked[:3]:
+        letter.append({"text": _first_person(_clean_quote(e["quote"])), "evidence_ids": [e["chunk_id"]]})
+    must_gaps = [g for g in ctx.get("gaps") or [] if g["importance"] == "must"]
+    if must_gaps:
+        letter.append(
+            {
+                "text": f"One requirement I have not yet fully met is \"{must_gaps[0]['text']}\", and I am keen to build it.",
+                "evidence_ids": [JOB_EVIDENCE_ID],
+            }
+        )
+    letter.append(
+        {"text": f"I would welcome the chance to discuss how I can contribute to {company}.", "evidence_ids": [JOB_EVIDENCE_ID]}
+    )
+    return {"bullets": bullets, "cover_letter": letter}
+
+
+# --- judge ------------------------------------------------------------------------------
+
+# Words that carry no factual claim in application prose.
+_PROSE_WORDS = {
+    "applying", "position", "role", "company", "chance", "discuss", "contribute", "welcome",
+    "keen", "excited", "believe", "profile", "includes", "work", "my", "built", "help", "helped",
+    "would", "like", "glad", "happy", "opportunity", "bring", "apply", "relevant", "fit",
+}
+CLAIM_RE = re.compile(
+    r"\b(built|led|developed|designed|implemented|deployed|managed|created|shipped|delivered|"
+    r"architected|owned|ran|mentored|years of|expert|proficient)\b",
+    re.IGNORECASE,
+)
+
+
+@handler("judge")
+def judge(ctx: dict[str, Any]) -> dict[str, Any]:
+    from jobfit.schemas import JOB_EVIDENCE_ID
+    from jobfit.textutil import content_terms
+
+    items = []
+    for s in ctx["sentences"]:
+        text = s["text"]
+        profile_ev = " ".join(e["text"] for e in s["evidence"] if e["id"] != JOB_EVIDENCE_ID)
+        job_ev = " ".join(e["text"] for e in s["evidence"] if e["id"] == JOB_EVIDENCE_ID)
+        tags = set(extract_tech_tags(text))
+
+        if not profile_ev:
+            # Only the job posting is cited: fine for statements about the role, not for claims.
+            claim = CLAIM_RE.search(text) and not NEGATION_RE.search(text)
+            unknown_tags = tags - set(extract_tech_tags(job_ev))
+            if claim:
+                items.append(_verdict(s, False, 0.85, "claims experience but cites only the job posting"))
+            elif unknown_tags:
+                items.append(_verdict(s, False, 0.8, f"mentions {', '.join(sorted(unknown_tags))}, which is not in the job posting"))
+            else:
+                items.append(_verdict(s, True, 0.8, "statement about the role, no candidate claim"))
+            continue
+
+        missing_tags = tags - set(extract_tech_tags(profile_ev))
+        if missing_tags:
+            items.append(_verdict(s, False, 0.9, f"{', '.join(sorted(missing_tags))} not in the cited evidence"))
+            continue
+        terms = content_terms(text) - _PROSE_WORDS
+        ev_terms = content_terms(profile_ev + " " + job_ev)
+        coverage = len(terms & ev_terms) / len(terms) if terms else 1.0
+        if coverage >= 0.6:
+            items.append(_verdict(s, True, 0.5 + coverage / 2, "content matches the cited evidence"))
+        else:
+            missing = sorted(terms - ev_terms)[:5]
+            items.append(_verdict(s, False, 0.5 + (1 - coverage) / 2, f"not in the evidence: {', '.join(missing)}"))
+    return {"items": items}
+
+
+def _verdict(s: dict[str, Any], supported: bool, confidence: float, reason: str) -> dict[str, Any]:
+    return {
+        "section": s["section"],
+        "index": s["index"],
+        "supported": supported,
+        "confidence": round(min(confidence, 1.0), 3),
+        "reason": reason,
+    }

@@ -17,6 +17,14 @@ STOPWORDS = frozenset(
 )
 
 NUMBER_RE = re.compile(r"(?<![\w.])(\d+(?:[.,]\d+)?)(\s*%|\+)?")
+NUMBER_WORDS = {
+    # "one" is left out on purpose: "one of", "one area" are far more common than "one year".
+    "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "seven": "7",
+    "eight": "8", "nine": "9", "ten": "10", "eleven": "11", "twelve": "12", "fifteen": "15",
+    "twenty": "20", "thirty": "30", "fifty": "50", "hundred": "100",
+    "dozen": "12", "zwei": "2", "drei": "3", "vier": "4", "fünf": "5", "zehn": "10",
+}
+_NUMBER_WORD_RE = re.compile(r"\b(" + "|".join(NUMBER_WORDS) + r")\b", re.IGNORECASE)
 
 
 def tokenize(text: str) -> list[str]:
@@ -38,8 +46,13 @@ def content_terms(text: str) -> set[str]:
 
 
 def extract_numbers(text: str) -> set[str]:
-    """Numbers that appear as claims ('5 years', '23%', '1.2 million'). Normalizes '1,2' -> '1.2'."""
-    return {m.group(1).replace(",", ".") for m in NUMBER_RE.finditer(text)}
+    """Numbers that appear as claims ('5 years', '23%', 'two engineers').
+
+    Normalizes '1,2' -> '1.2' and number words -> digits, so "two" and "2" match.
+    """
+    found = {m.group(1).replace(",", ".") for m in NUMBER_RE.finditer(text)}
+    found |= {NUMBER_WORDS[m.group(1).lower()] for m in _NUMBER_WORD_RE.finditer(text)}
+    return found
 
 
 def split_sentences(text: str) -> list[str]:

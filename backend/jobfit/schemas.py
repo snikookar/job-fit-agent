@@ -98,6 +98,7 @@ class Verdict(BaseModel):
     section: Literal["bullets", "cover_letter"]
     index: int
     text: str
+    evidence_ids: list[str] = Field(default_factory=list)
     supported: bool
     p_supported: float
     reason: str
@@ -127,6 +128,22 @@ class GapSuggestion(BaseModel):
 
 class GapSuggestionList(BaseModel):
     items: list[GapSuggestion]
+
+
+class JudgeItem(BaseModel):
+    section: Literal["bullets", "cover_letter"]
+    index: int
+    supported: bool
+    confidence: float = Field(ge=0.0, le=1.0)
+    reason: str
+
+
+class JudgeResult(BaseModel):
+    items: list[JudgeItem]
+
+
+# Sentences about the company or the role (not about the candidate) may cite the job posting.
+JOB_EVIDENCE_ID = "job"
 
 
 class ReviewDecision(BaseModel):

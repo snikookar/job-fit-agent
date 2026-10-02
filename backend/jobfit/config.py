@@ -52,7 +52,9 @@ class Settings(BaseSettings):
     evidence_top_k: int = 3  # evidence kept per requirement
 
     # --- Agent behaviour -------------------------------------------------------
-    max_revisions: int = 2  # writer <-> judge loop limit
+    # Max writer -> judge rounds. After the last round, sentences that are still
+    # unsupported are removed from the draft and reported to the user.
+    max_draft_rounds: int = 2
     # A sentence counts as supported when P(supported) from the judge >= this value.
     # Raise it to be stricter, lower it if the false alarm rate is too high.
     judge_threshold: float = 0.5
