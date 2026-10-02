@@ -151,4 +151,6 @@ class ReviewDecision(BaseModel):
 
     approved: bool = True
     draft: Draft | None = None  # edited draft; None means "approve as is"
+    # Edited sentences are fact-checked again; unsupported ones are removed unless this is set.
+    keep_unsupported_edits: bool = False
     note: str | None = None

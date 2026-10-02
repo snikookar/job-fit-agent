@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     # SQLite works out of the box; set a postgresql+psycopg:// URL to use pgvector.
     database_url: str = f"sqlite:///{(BACKEND_DIR / 'data' / 'jobfit.db').as_posix()}"
     export_dir: Path = BACKEND_DIR / "data" / "exports"
+    # Optional .docx whose styles/header/footer are used for exports (your own resume design).
+    export_template: Path | None = None
+    # LangGraph checkpoints when running on SQLite (on Postgres they share DATABASE_URL).
+    checkpoint_db: Path = BACKEND_DIR / "data" / "checkpoints.db"
 
     # --- LLMs ------------------------------------------------------------------
     # "auto": use the API if a key is set, otherwise the offline heuristic provider.

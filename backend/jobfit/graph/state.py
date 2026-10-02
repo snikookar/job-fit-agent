@@ -14,6 +14,7 @@ from typing import Annotated, Any, TypedDict
 
 class JobFitState(TypedDict, total=False):
     # --- input
+    run_id: str  # same as the LangGraph thread id
     job_url: str | None
     job_text_input: str | None
 

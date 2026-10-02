@@ -16,6 +16,7 @@ SAMPLE_PROFILE = REPO_DIR / "sample_profile"
 def isolated_settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("DATABASE_URL", f"sqlite:///{(tmp_path / 'test.db').as_posix()}")
     monkeypatch.setenv("EXPORT_DIR", str(tmp_path / "exports"))
+    monkeypatch.setenv("CHECKPOINT_DB", str(tmp_path / "checkpoints.db"))
     monkeypatch.setenv("LLM_PROVIDER", "heuristic")
     monkeypatch.setenv("EMBEDDING_BACKEND", "hash")
     monkeypatch.setenv("RERANKER_BACKEND", "lexical")
@@ -30,10 +31,13 @@ def isolated_settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
 
 
 def _clear_caches() -> None:
+    from jobfit.llm import get_judge_llm, get_writer_llm
     from jobfit.retrieval.embeddings import get_embedder
     from jobfit.retrieval.rerank import get_reranker
 
     get_settings.cache_clear()
+    get_writer_llm.cache_clear()
+    get_judge_llm.cache_clear()
     get_embedder.cache_clear()
     get_reranker.cache_clear()
 

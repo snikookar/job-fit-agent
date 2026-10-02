@@ -35,6 +35,9 @@ dependencies = [
     "python-docx>=1.1",
 ]
 
+[project.scripts]
+jobfit = "jobfit.cli:main"
+
 [project.optional-dependencies]
 # Real embeddings + reranker (bge-m3, bge-reranker-v2-m3). Pulls in PyTorch (~1-2 GB).
 ml = ["sentence-transformers>=3.3"]
