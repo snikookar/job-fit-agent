@@ -26,6 +26,11 @@ def replace_source(chunks: list[Chunk], source: str, embedder: Embedder) -> int:
     return len(chunks)
 
 
+def delete_source(source: str) -> None:
+    with session_scope() as s:
+        s.execute(delete(ChunkRow).where(ChunkRow.source == source))
+
+
 def delete_all() -> None:
     with session_scope() as s:
         s.execute(delete(ChunkRow))
