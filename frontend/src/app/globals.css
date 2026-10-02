@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* System fonts: no request to a font CDN, and the build works offline. */
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, "Liberation Mono", monospace;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+/* Shared building blocks (Tailwind v4: custom classes that can be @apply-ed are @utility). */
+@utility card {
+  @apply rounded-xl border border-slate-200 bg-white p-5 shadow-sm;
+}
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility btn-primary {
+  @apply btn bg-slate-900 text-white hover:bg-slate-700;
+}
+@utility btn-secondary {
+  @apply btn border border-slate-300 bg-white text-slate-800 hover:bg-slate-50;
+}
+@utility btn-danger {
+  @apply btn border border-rose-300 bg-white text-rose-700 hover:bg-rose-50;
+}
+@utility input {
+  @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200;
+}
+@utility label {
+  @apply mb-1 block text-sm font-medium text-slate-700;
+}
+@utility chip {
+  @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
+}
