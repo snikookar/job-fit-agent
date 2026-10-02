@@ -104,6 +104,31 @@ class Verdict(BaseModel):
     checks: list[str] = Field(default_factory=list)  # which checks fired (ids, numbers, llm)
 
 
+#  --- LLM step outputs (internal) -------------------------------------------------------
+
+
+class Assessment(BaseModel):
+    """How well one retrieved chunk supports one requirement."""
+
+    requirement_id: str
+    chunk_id: str
+    support: Literal["full", "partial", "none"]
+    quote: str = ""  # the exact span of the chunk that supports the requirement
+
+
+class AssessmentList(BaseModel):
+    items: list[Assessment]
+
+
+class GapSuggestion(BaseModel):
+    requirement_id: str
+    suggestion: str
+
+
+class GapSuggestionList(BaseModel):
+    items: list[GapSuggestion]
+
+
 class ReviewDecision(BaseModel):
     """What the user sends back from the human review step."""
 

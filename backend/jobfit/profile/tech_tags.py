@@ -56,7 +56,10 @@ TECH_VOCAB: dict[str, list[str]] = {
     "Qdrant": ["qdrant"],
     "Pinecone": ["pinecone"],
     "Weaviate": ["weaviate"],
-    "Vector databases": ["vector database", "vector databases", "vector db", "vector store"],
+    "Vector databases": [
+        "vector database", "vector databases", "vector db", "vector store",
+        "pgvector", "qdrant", "pinecone", "weaviate", "chroma", "milvus",
+    ],
     # Messaging / data engineering
     "Kafka": ["kafka"],
     "RabbitMQ": ["rabbitmq"],

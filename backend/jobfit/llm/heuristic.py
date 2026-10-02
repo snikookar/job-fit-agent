@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable
+from datetime import date
 from typing import Any
 
 from jobfit.llm.base import T, UsageTracker
@@ -182,3 +183,98 @@ def parse_requirements(ctx: dict[str, Any]) -> dict[str, Any]:
         "visa_sponsorship": visa,
         "requirements": requirements,
     }
+
+
+# --- assess_evidence ----------------------------------------------------------------
+
+NEGATION_RE = re.compile(r"\b(not|never|no|without|haven't|hasn't|didn't|nicht|kein\w*)\b", re.IGNORECASE)
+LEARNING_RE = re.compile(r"\b(learning|course|tutorial|experimented|notes)\b", re.IGNORECASE)
+_YEAR_RE = re.compile(r"\b(?:19|20)\d{2}\b")
+
+
+def span_years(date_range: str | None, current_year: int | None = None) -> float | None:
+    """Rough length of a date range in years ("03/2022 – present" -> ~4)."""
+    if not date_range:
+        return None
+    years = [int(y) for y in _YEAR_RE.findall(date_range)]
+    if re.search(r"present|current|now|today|heute|aktuell", date_range, re.IGNORECASE):
+        years.append(current_year or date.today().year)
+    if len(years) < 2:
+        return None
+    return max(years) - min(years)
+
+
+def _best_sentence(text: str, terms: set[str], tags: set[str]) -> str:
+    from jobfit.textutil import content_terms, split_sentences
+
+    for sentence in split_sentences(text):
+        if terms & content_terms(sentence) or tags & set(extract_tech_tags(sentence)):
+            return sentence
+    return text
+
+
+@handler("assess_evidence")
+def assess_evidence(ctx: dict[str, Any]) -> dict[str, Any]:
+    from jobfit.textutil import content_terms
+
+    items = []
+    for p in ctx["pairs"]:
+        req = p["requirement"]
+        req_terms = content_terms(req)
+        req_tags = set(extract_tech_tags(req))
+        is_language = p.get("category") == "language"
+        langs = {lang for lang in _LANGUAGES if lang in req.lower()}
+        for c in p["chunks"]:
+            text = c["text"]
+            chunk_terms = content_terms(f"{c['section']} {text}")
+            chunk_tags = set(extract_tech_tags(f"{c['section']} {text}"))
+            term_ratio = len(req_terms & chunk_terms) / len(req_terms) if req_terms else 0.0
+
+            if is_language and langs:
+                support = "full" if all(lang in text.lower() for lang in langs) else "none"
+            elif NEGATION_RE.search(text) and (req_tags & chunk_tags or term_ratio >= 0.5):
+                support = "none"  # "I have not run Kubernetes in production"
+            elif req_tags:
+                tag_ratio = len(req_tags & chunk_tags) / len(req_tags)
+                support = "full" if tag_ratio == 1 else "partial" if tag_ratio > 0 else (
+                    "partial" if term_ratio >= 0.5 else "none"
+                )
+            else:
+                support = "full" if term_ratio >= 0.6 else "partial" if term_ratio >= 0.3 else "none"
+
+            if support == "full":
+                span = span_years(c.get("date_range"))
+                stated = max((int(y) for y in YEARS_RE.findall(text)), default=None)  # "6+ years"
+                known = max(x for x in (span, stated, -1) if x is not None)
+                if p.get("years") and known < p["years"]:
+                    support = "partial"  # can't confirm the years from this chunk alone
+                elif LEARNING_RE.search(text):
+                    support = "partial"
+
+            quote = _best_sentence(text, req_terms, req_tags) if support != "none" else ""
+            items.append(
+                {"requirement_id": p["requirement_id"], "chunk_id": c["chunk_id"], "support": support, "quote": quote}
+            )
+    return {"items": items}
+
+
+# --- gap_suggestions ----------------------------------------------------------------
+
+
+@handler("gap_suggestions")
+def gap_suggestions(ctx: dict[str, Any]) -> dict[str, Any]:
+    items = []
+    for g in ctx["gaps"]:
+        if g["importance"] == "must":
+            text = (
+                f"Must-have with little evidence: \"{g['requirement']}\". If you have this experience, "
+                "add it to your resume or a project write-up so it can be cited. Otherwise, build it "
+                "with a small project and address it openly in your cover letter."
+            )
+        else:
+            text = (
+                "Nice to have. If you've used this, add a line about it to your profile; "
+                "otherwise you can leave it out."
+            )
+        items.append({"requirement_id": g["requirement_id"], "suggestion": text})
+    return {"items": items}
