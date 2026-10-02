@@ -1,0 +1,71 @@
+[project]
+name = "jobfit"
+version = "0.1.0"
+description = "A resume tailoring agent that won't let you lie: every claim is linked to its evidence."
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    # Agent orchestration
+    "langgraph>=1.0",
+    "langgraph-checkpoint-postgres>=3.0",
+    "langgraph-checkpoint-sqlite>=3.0",
+    # LLM access (DeepSeek and GLM both expose OpenAI-compatible APIs)
+    "openai>=2.0",
+    # API
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "sse-starlette>=2.1",
+    "python-multipart>=0.0.12",
+    # Data + config
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "pyyaml>=6.0",
+    "sqlalchemy>=2.0.36",
+    "psycopg[binary]>=3.2",
+    "pgvector>=0.3.6",
+    # Fetching + parsing
+    "httpx>=0.27",
+    "trafilatura>=2.0",
+    "langdetect>=1.0.9",
+    "pymupdf>=1.25",
+    # Retrieval
+    "numpy>=1.26",
+    "rank-bm25>=0.2.2",
+    # Export
+    "python-docx>=1.1",
+]
+
+[project.optional-dependencies]
+# Real embeddings + reranker (bge-m3, bge-reranker-v2-m3). Pulls in PyTorch (~1-2 GB).
+ml = ["sentence-transformers>=3.3"]
+# Layout-aware resume parsing. Also heavy (downloads layout models on first run).
+docling = ["docling>=2.15"]
+# Headless browser fallback for JavaScript-rendered career pages.
+browser = ["playwright>=1.49"]
+# LLM tracing.
+tracing = ["langfuse>=3.0"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["jobfit"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+ignore = ["E501", "B008"]

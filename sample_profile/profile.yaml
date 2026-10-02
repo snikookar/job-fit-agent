@@ -1,0 +1,8 @@
+# Contact details for the exported .docx header.
+# Mira Lindqvist is a fictional persona used for the public demo.
+name: Mira Lindqvist
+headline: AI Engineer
+email: mira.lindqvist@example.com
+location: Berlin, Germany
+links:
+  - github.com/mira-lindqvist-demo
