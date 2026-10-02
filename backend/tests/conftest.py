@@ -21,12 +21,29 @@ def isolated_settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("RERANKER_BACKEND", "lexical")
     monkeypatch.setenv("WRITER_API_KEY", "")
     monkeypatch.setenv("JUDGE_API_KEY", "")
-    get_settings.cache_clear()
+    _clear_caches()
     db_session.reset_engine()
     db_session.init_db()
     yield get_settings()
     db_session.reset_engine()
+    _clear_caches()
+
+
+def _clear_caches() -> None:
+    from jobfit.retrieval.embeddings import get_embedder
+    from jobfit.retrieval.rerank import get_reranker
+
     get_settings.cache_clear()
+    get_embedder.cache_clear()
+    get_reranker.cache_clear()
+
+
+@pytest.fixture
+def sample_profile():
+    """The fictional profile, ingested into the test database."""
+    from jobfit.profile.ingest import load_sample_profile
+
+    return load_sample_profile()
 
 
 @pytest.fixture
