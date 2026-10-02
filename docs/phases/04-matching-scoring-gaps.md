@@ -57,9 +57,14 @@ The gap prompt says: if you might have this experience, **add it to your profile
 
 ```
 must 0.43 4+ years of professional experience with Python  <- partial
+must 0.84 Experience building RAG systems with vector DBs  <- full
 must 1.00 Solid knowledge of PostgreSQL                    <- full
 must 0.42 3+ years of experience running Kubernetes...     <- partial (learning repo only)
 nice 1.00 Familiarity with Terraform                       <- full
 nice 0.00 Experience with Rust                             <- nothing
-SCORE 66.0   must coverage 0.5
+SCORE 71.9   must coverage 0.667
 ```
+
+Kubernetes is correctly weak: the only evidence is a learning repo, and *"I have not run Kubernetes in production"* is rejected.
+
+Python is a limitation of the offline mode. Mira's summary says "6+ years… Python", but with lexical-only retrieval that chunk doesn't make the top 3, and the heuristic can't confirm "4+ years" from a single role's dates. With bge-m3 and a real LLM, which can add up the date ranges, this becomes `full`. The eval in Phase 8 measures exactly this kind of difference.
