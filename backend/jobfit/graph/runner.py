@@ -62,7 +62,9 @@ def _summary(node: str, update: dict[str, Any]) -> dict[str, Any]:
 
 
 class JobFitAgent:
-    def __init__(self, svc: Services | None = None, checkpointer: BaseCheckpointSaver | None = None):
+    def __init__(
+        self, svc: Services | None = None, checkpointer: BaseCheckpointSaver | None = None
+    ):
         self.checkpointer = checkpointer or make_checkpointer()
         self.graph = build_graph(svc, self.checkpointer)
 
@@ -70,7 +72,9 @@ class JobFitAgent:
     def _config(run_id: str) -> dict[str, Any]:
         return {"configurable": {"thread_id": run_id}, "recursion_limit": 50}
 
-    def start(self, run_id: str, job_url: str | None = None, job_text: str | None = None) -> Iterator[RunEvent]:
+    def start(
+        self, run_id: str, job_url: str | None = None, job_text: str | None = None
+    ) -> Iterator[RunEvent]:
         inputs = {"run_id": run_id, "job_url": job_url, "job_text_input": job_text, "revision": 0}
         yield from self._stream(inputs, run_id)
 
@@ -86,7 +90,9 @@ class JobFitAgent:
                         yield RunEvent("interrupt", "human_review", {"value": update[0].value})
                     elif isinstance(update, dict):
                         yield RunEvent("node", node, _summary(node, update))
-        except Exception as exc:  # surface node errors as events (e.g. a page that can't be fetched)
+        except (
+            Exception
+        ) as exc:  # surface node errors as events (e.g. a page that can't be fetched)
             log.exception("run %s failed", run_id)
             snapshot = self.graph.get_state(config)
             failed = snapshot.next[0] if snapshot.next else None
@@ -98,7 +104,10 @@ class JobFitAgent:
             yield RunEvent(
                 "done",
                 None,
-                {"application_id": values.get("application_id"), "docx": bool(values.get("docx_path"))},
+                {
+                    "application_id": values.get("application_id"),
+                    "docx": bool(values.get("docx_path")),
+                },
             )
 
     def state(self, run_id: str) -> dict[str, Any] | None:

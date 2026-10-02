@@ -61,13 +61,19 @@ def test_lever_uses_public_api():
         "text": "Data Engineer",
         "categories": {"location": "Remote - EU"},
         "descriptionPlain": "We move data around for a living, at scale, for many happy customers.",
-        "lists": [{"text": "Requirements", "content": "<li>Airflow</li><li>dbt and Snowflake</li>"}],
+        "lists": [
+            {"text": "Requirements", "content": "<li>Airflow</li><li>dbt and Snowflake</li>"}
+        ],
         "additionalPlain": "",
     }
     job = fetch_url(
         f"https://jobs.lever.co/examplecorp/{pid}",
         transport=_transport(
-            {f"https://api.lever.co/v0/postings/examplecorp/{pid}": httpx.Response(200, json=payload)}
+            {
+                f"https://api.lever.co/v0/postings/examplecorp/{pid}": httpx.Response(
+                    200, json=payload
+                )
+            }
         ),
     )
     assert job.source == "lever"

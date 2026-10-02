@@ -20,7 +20,18 @@ from jobfit.textutil import extract_numbers
 
 N_FABRICATED = 100
 N_CLEAN = 50
-INJECTABLE_TOOLS = ["Kubernetes", "Kafka", "Spark", "Snowflake", "Rust", "Azure", "Elasticsearch", "MongoDB", "Redis", "GraphQL"]
+INJECTABLE_TOOLS = [
+    "Kubernetes",
+    "Kafka",
+    "Spark",
+    "Snowflake",
+    "Rust",
+    "Azure",
+    "Elasticsearch",
+    "MongoDB",
+    "Redis",
+    "GraphQL",
+]
 PAST_VERB = re.compile(r"^(?:[A-Z][a-z]+ed|Built|Led|Ran|Wrote|Set)\b")
 
 
@@ -80,7 +91,15 @@ def seniority(s: str, ev: str) -> str | None:
     return f"As the lead architect, I {_lower_first(s)}"
 
 
-MUTATIONS = [number_change, years_claim, tool_injection, scope_inflation, fake_certification, outcome_invention, seniority]
+MUTATIONS = [
+    number_change,
+    years_claim,
+    tool_injection,
+    scope_inflation,
+    fake_certification,
+    outcome_invention,
+    seniority,
+]
 
 
 def as_letter(s: str) -> str:

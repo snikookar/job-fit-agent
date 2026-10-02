@@ -39,10 +39,14 @@ def human_review(state: JobFitState, svc: Services) -> dict:
     final = decision.draft or proposed
     original = {(sec, s.text, tuple(s.evidence_ids)) for sec, _, s in iter_sentences(proposed)}
     edited = {
-        (sec, i) for sec, i, s in iter_sentences(final) if (sec, s.text, tuple(s.evidence_ids)) not in original
+        (sec, i)
+        for sec, i, s in iter_sentences(final)
+        if (sec, s.text, tuple(s.evidence_ids)) not in original
     }
     verdicts = (
-        judge_draft(final, state.get("job_text", ""), svc.judge, svc.settings.judge_threshold, only=edited)
+        judge_draft(
+            final, state.get("job_text", ""), svc.judge, svc.settings.judge_threshold, only=edited
+        )
         if edited
         else []
     )

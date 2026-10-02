@@ -32,7 +32,9 @@ def test_heuristic_extracts_must_and_nice():
     assert texts["Familiarity with Terraform"].importance == "nice"
     assert texts["Fluent English"].category == "language"
     assert texts["German language skills"].importance == "nice"
-    assert [r.id for r in req.requirements] == [f"r{i}" for i in range(1, len(req.requirements) + 1)]
+    assert [r.id for r in req.requirements] == [
+        f"r{i}" for i in range(1, len(req.requirements) + 1)
+    ]
     assert out["trace"][0]["node"] == "parse_requirements"
 
 
@@ -53,7 +55,11 @@ def test_node_uses_llm_output_and_normalizes_it():
             ]
         }
     )
-    state = {"job_text": JOB, "language": "en", "job_hints": {"title": "Hinted title", "company": "acme"}}
+    state = {
+        "job_text": JOB,
+        "language": "en",
+        "job_hints": {"title": "Hinted title", "company": "acme"},
+    }
     out = parse_requirements(state, _svc(llm))
     req = JobRequirements.model_validate(out["requirements"])
     assert [(r.id, r.text) for r in req.requirements] == [("r1", "Python"), ("r2", "Go")]

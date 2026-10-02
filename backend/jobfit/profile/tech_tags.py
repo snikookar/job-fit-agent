@@ -57,8 +57,16 @@ TECH_VOCAB: dict[str, list[str]] = {
     "Pinecone": ["pinecone"],
     "Weaviate": ["weaviate"],
     "Vector databases": [
-        "vector database", "vector databases", "vector db", "vector store",
-        "pgvector", "qdrant", "pinecone", "weaviate", "chroma", "milvus",
+        "vector database",
+        "vector databases",
+        "vector db",
+        "vector store",
+        "pgvector",
+        "qdrant",
+        "pinecone",
+        "weaviate",
+        "chroma",
+        "milvus",
     ],
     # Messaging / data engineering
     "Kafka": ["kafka"],
@@ -77,7 +85,14 @@ TECH_VOCAB: dict[str, list[str]] = {
     "TensorFlow": ["tensorflow", "keras"],
     "scikit-learn": ["scikit-learn", "sklearn"],
     "Hugging Face": ["hugging face", "huggingface", "transformers"],
-    "LLM": ["llm", "llms", "large language model", "large language models", "genai", "generative ai"],
+    "LLM": [
+        "llm",
+        "llms",
+        "large language model",
+        "large language models",
+        "genai",
+        "generative ai",
+    ],
     "RAG": ["rag", "retrieval-augmented generation", "retrieval augmented generation"],
     "LangChain": ["langchain"],
     "LangGraph": ["langgraph"],
@@ -127,14 +142,22 @@ def _patterns() -> list[tuple[str, re.Pattern[str]]]:
 
 
 # Aliases that are too ambiguous to trust in free text unless written in a tech-ish way.
-_CASE_SENSITIVE = {"Go": re.compile(r"\bGo\b"), "R": re.compile(r"\bR\b"), "REST": re.compile(r"\bREST")}
+_CASE_SENSITIVE = {
+    "Go": re.compile(r"\bGo\b"),
+    "R": re.compile(r"\bR\b"),
+    "REST": re.compile(r"\bREST"),
+}
 
 
 def extract_tech_tags(text: str) -> list[str]:
     found: list[str] = []
     for canonical, pattern in _patterns():
         if canonical in _CASE_SENSITIVE:
-            if canonical == "Go" and re.search(r"\bgolang\b", text, re.IGNORECASE) or _CASE_SENSITIVE[canonical].search(text):
+            if (
+                canonical == "Go"
+                and re.search(r"\bgolang\b", text, re.IGNORECASE)
+                or _CASE_SENSITIVE[canonical].search(text)
+            ):
                 found.append(canonical)
             continue
         if pattern.search(text):

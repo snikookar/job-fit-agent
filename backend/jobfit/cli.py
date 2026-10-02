@@ -1,10 +1,10 @@
 """Command line interface.
 
-    uv run jobfit load-sample
-    uv run jobfit ingest resume.pdf projects/*.md
-    uv run jobfit ingest-github octocat
-    uv run jobfit analyze --file posting.txt            # stops at human review
-    uv run jobfit analyze --url https://... --approve   # approve as is and export .docx
+uv run jobfit load-sample
+uv run jobfit ingest resume.pdf projects/*.md
+uv run jobfit ingest-github octocat
+uv run jobfit analyze --file posting.txt            # stops at human review
+uv run jobfit analyze --url https://... --approve   # approve as is and export .docx
 """
 
 from __future__ import annotations
@@ -22,7 +22,9 @@ def _print_event(e) -> None:
     if e.type == "node":
         t = e.data.get("trace", {})
         extra = {k: v for k, v in e.data.items() if k != "trace"}
-        print(f"  ✓ {e.node:<20} {t.get('seconds', 0):>6.2f}s  {json.dumps(extra, ensure_ascii=False)}")
+        print(
+            f"  ✓ {e.node:<20} {t.get('seconds', 0):>6.2f}s  {json.dumps(extra, ensure_ascii=False)}"
+        )
     elif e.type == "interrupt":
         print("  ⏸ human_review: waiting for approval")
     elif e.type == "error":
@@ -33,7 +35,9 @@ def _print_event(e) -> None:
 
 def _show_result(values: dict) -> None:
     score = values.get("score") or {}
-    print(f"\nScore: {score.get('score')} / 100   (must-have coverage {score.get('must_coverage')})")
+    print(
+        f"\nScore: {score.get('score')} / 100   (must-have coverage {score.get('must_coverage')})"
+    )
     for item in score.get("items", []):
         print(f"  [{item['importance']:4}] {item['strength']:.2f}  {item['text']}")
     if values.get("gaps"):
@@ -56,19 +60,25 @@ def _show_result(values: dict) -> None:
 def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    parser = argparse.ArgumentParser(prog="jobfit", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        prog="jobfit", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     sub = parser.add_subparsers(dest="cmd", required=True)
     sub.add_parser("load-sample", help="load the fictional demo profile")
     p_ing = sub.add_parser("ingest", help="ingest a resume (.pdf/.docx/.md) and project .md files")
     p_ing.add_argument("resume")
     p_ing.add_argument("projects", nargs="*")
-    p_gh = sub.add_parser("ingest-github", help="ingest READMEs of a GitHub user or owner/repo list")
+    p_gh = sub.add_parser(
+        "ingest-github", help="ingest READMEs of a GitHub user or owner/repo list"
+    )
     p_gh.add_argument("target")
     p_an = sub.add_parser("analyze", help="analyze a job posting")
     src = p_an.add_mutually_exclusive_group(required=True)
     src.add_argument("--url")
     src.add_argument("--file", type=Path)
-    p_an.add_argument("--approve", action="store_true", help="approve the draft as is and export .docx")
+    p_an.add_argument(
+        "--approve", action="store_true", help="approve the draft as is and export .docx"
+    )
     args = parser.parse_args(argv)
 
     init_db()

@@ -54,7 +54,9 @@ class RunManager:
         with self._lock:
             self._active.add(run_id)
             self._events.setdefault(run_id, [])
-        threading.Thread(target=self._consume, args=(run_id, events), daemon=True, name=f"run-{run_id}").start()
+        threading.Thread(
+            target=self._consume, args=(run_id, events), daemon=True, name=f"run-{run_id}"
+        ).start()
 
     def _consume(self, run_id: str, events: Iterator[RunEvent]) -> None:
         try:
@@ -102,7 +104,9 @@ class RunManager:
         with self._lock:
             return [e for e in self._events.get(run_id, []) if e["seq"] > after]
 
-    async def subscribe(self, run_id: str, after: int = -1, poll_s: float = 0.15) -> AsyncIterator[dict[str, Any]]:
+    async def subscribe(
+        self, run_id: str, after: int = -1, poll_s: float = 0.15
+    ) -> AsyncIterator[dict[str, Any]]:
         """Yield events after `after` until the run pauses, finishes or fails."""
         while True:
             new = self.events(run_id, after)
@@ -121,4 +125,6 @@ def mark_orphaned_runs() -> None:
     with session_scope() as s:
         for run in s.scalars(select(Run).where(Run.status == "running")):
             run.status = "failed"
-            run.error = "The server restarted while this run was in progress. Please start it again."
+            run.error = (
+                "The server restarted while this run was in progress. Please start it again."
+            )

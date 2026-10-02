@@ -62,7 +62,11 @@ def match_evidence(state: JobFitState, svc: Services) -> dict:
                 if a is None or a.support == "none":
                     continue
                 # Only accept a quote that really is in the chunk; otherwise cite the whole chunk.
-                quote = a.quote.strip() if a.quote and a.quote.strip() in hit.chunk.text else hit.chunk.text
+                quote = (
+                    a.quote.strip()
+                    if a.quote and a.quote.strip() in hit.chunk.text
+                    else hit.chunk.text
+                )
                 evidence[r.id].append(
                     Evidence(
                         requirement_id=r.id,
@@ -85,6 +89,8 @@ def _format_pairs(pairs_ctx: list[dict]) -> str:
         lines.append(f"## Requirement {p['requirement_id']}: {p['requirement']}{years}")
         for c in p["chunks"]:
             dates = f" | dates: {c['date_range']}" if c["date_range"] else ""
-            lines.append(f"- chunk_id: {c['chunk_id']} | from: {c['section']}{dates}\n  text: {c['text']}")
+            lines.append(
+                f"- chunk_id: {c['chunk_id']} | from: {c['section']}{dates}\n  text: {c['text']}"
+            )
         lines.append("")
     return "\n".join(lines)

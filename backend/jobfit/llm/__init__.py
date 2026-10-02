@@ -32,7 +32,12 @@ def get_writer_llm() -> LLM:
     from jobfit.llm.api import OpenAICompatibleLLM
 
     return OpenAICompatibleLLM(
-        s.writer_base_url, s.writer_api_key, s.writer_model, s.llm_temperature, s.llm_timeout_s, "writer"
+        s.writer_base_url,
+        s.writer_api_key,
+        s.writer_model,
+        s.llm_temperature,
+        s.llm_timeout_s,
+        "writer",
     )
 
 

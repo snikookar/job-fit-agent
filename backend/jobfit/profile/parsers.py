@@ -54,7 +54,9 @@ def _pdf_to_markdown_pymupdf(data: bytes) -> str:
                                 "NFKC", " ".join(s["text"].strip() for s in spans)
                             ),
                             "size": max(s["size"] for s in spans),
-                            "bold": all(s["flags"] & 16 or "bold" in s["font"].lower() for s in spans),
+                            "bold": all(
+                                s["flags"] & 16 or "bold" in s["font"].lower() for s in spans
+                            ),
                             "x0": line["bbox"][0],
                             "y0": line["bbox"][1] + page_no * 10_000,
                             "y1": line["bbox"][3] + page_no * 10_000,

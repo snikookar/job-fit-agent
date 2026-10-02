@@ -80,7 +80,11 @@ def test_unsupported_user_edits_are_removed_unless_kept(agent):
 
     # the user can keep an edit on purpose; it stays flagged
     _start(agent, "run2")
-    list(agent.resume("run2", ReviewDecision(approved=True, draft=edited, keep_unsupported_edits=True)))
+    list(
+        agent.resume(
+            "run2", ReviewDecision(approved=True, draft=edited, keep_unsupported_edits=True)
+        )
+    )
     state = agent.state("run2")
     assert len(state["final_draft"]["bullets"]) == 2
     assert any(not v["supported"] for v in state["final_verdicts"])
@@ -112,7 +116,10 @@ def test_writer_judge_loop_runs_inside_the_graph(sample_profile):
     agent = JobFitAgent(Services(writer=writer, judge=HeuristicLLM("judge")))
     events = _start(agent)
     assert [e.node for e in events if e.node in ("writer", "grounding_judge")] == [
-        "writer", "grounding_judge", "writer", "grounding_judge",
+        "writer",
+        "grounding_judge",
+        "writer",
+        "grounding_judge",
     ]
     state = agent.state("run1")
     assert [v["text"] for v in state["removed"]] == [fake["text"]]
@@ -124,12 +131,19 @@ def test_docx_with_evidence_comments(tmp_path, sample_profile):
     chunk = store.list_chunks("resume")[3]
     draft = Draft(
         bullets=[DraftSentence(text=chunk.text, evidence_ids=[chunk.id])],
-        cover_letter=[DraftSentence(text="Ich bewerbe mich als Data Engineer.", evidence_ids=["job"])],
+        cover_letter=[
+            DraftSentence(text="Ich bewerbe mich als Data Engineer.", evidence_ids=["job"])
+        ],
     )
     job = JobRequirements(title="Data Engineer", company="Beispiel GmbH", requirements=[])
     path = build_docx(
-        draft, job, {"name": "Mira Lindqvist", "email": "mira@example.com"}, tmp_path / "a.docx",
-        language="de", evidence={chunk.id: chunk}, evidence_comments=True,
+        draft,
+        job,
+        {"name": "Mira Lindqvist", "email": "mira@example.com"},
+        tmp_path / "a.docx",
+        language="de",
+        evidence={chunk.id: chunk},
+        evidence_comments=True,
     )
     d = docx.Document(str(path))
     texts = [p.text for p in d.paragraphs]

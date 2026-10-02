@@ -66,7 +66,9 @@ def load_sample_profile(embedder: Embedder | None = None) -> list[IngestResult]:
         results.append(ingest_markdown(p.name, p.read_text(encoding="utf-8"), "project", embedder))
     for p in sorted((d / "github").glob("*.md")):
         full_name = p.stem.replace("__", "/", 1)  # files are named owner__repo.md
-        results.append(ingest_markdown(full_name, p.read_text(encoding="utf-8"), "github", embedder))
+        results.append(
+            ingest_markdown(full_name, p.read_text(encoding="utf-8"), "github", embedder)
+        )
     info = yaml.safe_load((d / "profile.yaml").read_text(encoding="utf-8"))
     set_profile_info(info)
     return results

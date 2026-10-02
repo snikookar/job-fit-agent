@@ -38,7 +38,9 @@ def upsert_from_run(
 ) -> int:
     """Create the tracker card for a run, or update it if the run is exported again."""
     with session_scope() as s:
-        app = s.scalars(select(Application).where(Application.run_thread_id == run_thread_id)).first()
+        app = s.scalars(
+            select(Application).where(Application.run_thread_id == run_thread_id)
+        ).first()
         if app is None:
             app = Application(run_thread_id=run_thread_id, title=title, status="saved")
             s.add(app)
@@ -66,7 +68,9 @@ def get_docx_path(app_id: int) -> str | None:
         return a.docx_path if a else None
 
 
-def create_application(title: str, company: str | None = None, url: str | None = None) -> dict[str, Any]:
+def create_application(
+    title: str, company: str | None = None, url: str | None = None
+) -> dict[str, Any]:
     with session_scope() as s:
         a = Application(title=title, company=company, url=url, status="saved")
         s.add(a)
@@ -74,7 +78,9 @@ def create_application(title: str, company: str | None = None, url: str | None =
         return _to_dict(a)
 
 
-def update_application(app_id: int, status: str | None = None, notes: str | None = None) -> dict[str, Any] | None:
+def update_application(
+    app_id: int, status: str | None = None, notes: str | None = None
+) -> dict[str, Any] | None:
     if status is not None and status not in APPLICATION_STATUSES:
         raise ValueError(f"status must be one of {APPLICATION_STATUSES}")
     with session_scope() as s:

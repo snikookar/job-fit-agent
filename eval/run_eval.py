@@ -50,7 +50,11 @@ def _similarity(a: str, b: str) -> float:
 def match_requirements(predicted: list[str], gold: list[list[str]], threshold: float = 0.5):
     """Greedy one-to-one matching. A gold item may have several text variants (languages)."""
     pairs = sorted(
-        ((max(_similarity(p, g) for g in variants), i, j) for i, p in enumerate(predicted) for j, variants in enumerate(gold)),
+        (
+            (max(_similarity(p, g) for g in variants), i, j)
+            for i, p in enumerate(predicted)
+            for j, variants in enumerate(gold)
+        ),
         reverse=True,
     )
     used_p, used_g, matches = set(), set(), []
@@ -99,7 +103,10 @@ def suite_pipeline(limit: int | None) -> dict:
     from jobfit.graph.runner import JobFitAgent
 
     agent = JobFitAgent()
-    jobs = [yaml.safe_load(p.read_text(encoding="utf-8")) for p in sorted((_setup.EVAL_DIR / "jobs").glob("*.yaml"))]
+    jobs = [
+        yaml.safe_load(p.read_text(encoding="utf-8"))
+        for p in sorted((_setup.EVAL_DIR / "jobs").glob("*.yaml"))
+    ]
     jobs = jobs[:limit] if limit else jobs
 
     tp = fp = fn = importance_ok = 0
@@ -119,7 +126,9 @@ def suite_pipeline(limit: int | None) -> dict:
         tp += len(matches)
         fp += len(predicted) - len(matches)
         fn += len(gold) - len(matches)
-        importance_ok += sum(1 for i, j in matches if reqs[i]["importance"] == job["gold"][j]["importance"])
+        importance_ok += sum(
+            1 for i, j in matches if reqs[i]["importance"] == job["gold"][j]["importance"]
+        )
 
         score = state["score"]["score"]
         scores.append(score)
@@ -141,14 +150,18 @@ def suite_pipeline(limit: int | None) -> dict:
                 "seconds": round(elapsed, 2),
             }
         )
-        print(f"  {job['id']:<28} score {score:5.1f}  human {job['fit_rating']}  matched {len(matches)}/{len(gold)}")
+        print(
+            f"  {job['id']:<28} score {score:5.1f}  human {job['fit_rating']}  matched {len(matches)}/{len(gold)}"
+        )
 
     precision = tp / (tp + fp) if tp + fp else 0.0
     recall = tp / (tp + fn) if tp + fn else 0.0
     return {
         "extraction_precision": round(precision, 3),
         "extraction_recall": round(recall, 3),
-        "extraction_f1": round(2 * precision * recall / (precision + recall), 3) if precision + recall else 0.0,
+        "extraction_f1": round(2 * precision * recall / (precision + recall), 3)
+        if precision + recall
+        else 0.0,
         "importance_accuracy": round(importance_ok / tp, 3) if tp else 0.0,
         "score_spearman": round(spearman(scores, ratings), 3) if len(scores) > 2 else None,
         "latency_mean_s": round(statistics.mean(seconds), 2) if seconds else None,
@@ -163,7 +176,13 @@ def suite_retrieval() -> dict:
     from jobfit.retrieval.search import HybridRetriever
 
     retriever = HybridRetriever()
-    pairs = [json.loads(line) for line in (_setup.EVAL_DIR / "retrieval_pairs.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    pairs = [
+        json.loads(line)
+        for line in (_setup.EVAL_DIR / "retrieval_pairs.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if line.strip()
+    ]
     hits_at_1 = hits_at_5 = 0
     rr_sum = 0.0
     misses = []
@@ -172,7 +191,9 @@ def suite_retrieval() -> dict:
         ranks = [
             rank
             for rank, h in enumerate(hits, start=1)
-            if any(e.lower() in f"{h.chunk.section} {h.chunk.text}".lower() for e in pair["expected"])
+            if any(
+                e.lower() in f"{h.chunk.section} {h.chunk.text}".lower() for e in pair["expected"]
+            )
         ]
         if ranks:
             hits_at_5 += 1
@@ -204,7 +225,13 @@ def suite_fabrication(batch: int = 10) -> dict:
     from jobfit.schemas import Draft
 
     judge = get_judge_llm()
-    cases = [json.loads(line) for line in (_setup.EVAL_DIR / "fabrication_set.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    cases = [
+        json.loads(line)
+        for line in (_setup.EVAL_DIR / "fabrication_set.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if line.strip()
+    ]
 
     def flagged_ids(layers: frozenset[str]) -> set[str]:
         if not layers:
@@ -214,8 +241,16 @@ def suite_fabrication(batch: int = 10) -> dict:
             group = cases[start : start + batch]
             # One draft per batch, like a real draft with ~10 sentences.
             draft = Draft(
-                bullets=[{"text": c["text"], "evidence_ids": c["evidence_ids"]} for c in group if c["section"] == "bullets"],
-                cover_letter=[{"text": c["text"], "evidence_ids": c["evidence_ids"]} for c in group if c["section"] == "cover_letter"],
+                bullets=[
+                    {"text": c["text"], "evidence_ids": c["evidence_ids"]}
+                    for c in group
+                    if c["section"] == "bullets"
+                ],
+                cover_letter=[
+                    {"text": c["text"], "evidence_ids": c["evidence_ids"]}
+                    for c in group
+                    if c["section"] == "cover_letter"
+                ],
             )
             verdicts = judge_draft(draft, "", judge, layers=layers)
             by_pos = {(v.section, v.index): v for v in verdicts}
@@ -243,7 +278,9 @@ def suite_fabrication(batch: int = 10) -> dict:
                 "false_alarm_rate": round(sum(c["id"] in flagged for c in clean) / len(clean), 3),
             }
         )
-        print(f"  {name.replace(chr(10), ' '):<36} recall {configs[-1]['recall']:.2f}  false alarms {configs[-1]['false_alarm_rate']:.2f}")
+        print(
+            f"  {name.replace(chr(10), ' '):<36} recall {configs[-1]['recall']:.2f}  false alarms {configs[-1]['false_alarm_rate']:.2f}"
+        )
 
     by_mutation: dict[str, list[bool]] = {}
     for c in fabricated:
@@ -255,7 +292,9 @@ def suite_fabrication(batch: int = 10) -> dict:
         "fabrication_recall": full["recall"],
         "false_alarm_rate": full["false_alarm_rate"],
         "fabrication_by_config": configs,
-        "fabrication_recall_by_mutation": {k: round(sum(v) / len(v), 3) for k, v in sorted(by_mutation.items())},
+        "fabrication_recall_by_mutation": {
+            k: round(sum(v) / len(v), 3) for k, v in sorted(by_mutation.items())
+        },
         "missed_fabrications": [c["text"] for c in fabricated if c["id"] not in full_flagged][:20],
         "false_alarms": [c["text"] for c in clean if c["id"] in full_flagged][:20],
     }
@@ -277,8 +316,20 @@ def plot_fabrication(configs: list[dict], meta: dict, path: Path) -> bool:
     x = range(len(configs))
     fig, ax = plt.subplots(figsize=(9, 4.5), dpi=150)
     w = 0.38
-    b1 = ax.bar([i - w / 2 for i in x], [c["recall"] for c in configs], w, label="Fabrications caught (recall)", color="#2a7f62")
-    b2 = ax.bar([i + w / 2 for i in x], [c["false_alarm_rate"] for c in configs], w, label="Correct sentences rejected (false alarms)", color="#c8553d")
+    b1 = ax.bar(
+        [i - w / 2 for i in x],
+        [c["recall"] for c in configs],
+        w,
+        label="Fabrications caught (recall)",
+        color="#2a7f62",
+    )
+    b2 = ax.bar(
+        [i + w / 2 for i in x],
+        [c["false_alarm_rate"] for c in configs],
+        w,
+        label="Correct sentences rejected (false alarms)",
+        color="#c8553d",
+    )
     ax.bar_label(b1, fmt="%.2f", fontsize=8)
     ax.bar_label(b2, fmt="%.2f", fontsize=8)
     ax.axhline(0.95, ls="--", lw=1, color="#2a7f62", alpha=0.6)
@@ -286,7 +337,9 @@ def plot_fabrication(configs: list[dict], meta: dict, path: Path) -> bool:
     ax.set_xticks(list(x), labels, fontsize=8)
     ax.set_ylim(0, 1.1)
     ax.set_ylabel("rate")
-    ax.set_title(f"Fabrication detection with and without the judge\njudge: {meta['judge']}", fontsize=10)
+    ax.set_title(
+        f"Fabrication detection with and without the judge\njudge: {meta['judge']}", fontsize=10
+    )
     ax.legend(fontsize=8, loc="upper left")
     ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()
@@ -319,7 +372,9 @@ def to_markdown(results: dict, meta: dict) -> str:
         lines.append(
             f"| Latency per posting (to review step) | mean {results['latency_mean_s']} s, p95 {results['latency_p95_s']} s |"
         )
-        lines.append(f"| LLM calls / tokens per posting | {results['llm_calls_mean']} calls, {results['tokens_mean']} tokens |")
+        lines.append(
+            f"| LLM calls / tokens per posting | {results['llm_calls_mean']} calls, {results['tokens_mean']} tokens |"
+        )
     if results.get("fabrication_by_config"):
         lines += ["", "| Grounding checks | Fabrication recall | False alarms |", "|---|---|---|"]
         for c in results["fabrication_by_config"]:
@@ -331,10 +386,16 @@ def to_markdown(results: dict, meta: dict) -> str:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--suite", choices=["all", "pipeline", "retrieval", "fabrication"], default="all")
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument(
+        "--suite", choices=["all", "pipeline", "retrieval", "fabrication"], default="all"
+    )
     parser.add_argument("--limit", type=int, help="only the first N job postings")
-    parser.add_argument("--name", default="latest", help="results file name (eval/results/<name>.json)")
+    parser.add_argument(
+        "--name", default="latest", help="results file name (eval/results/<name>.json)"
+    )
     args = parser.parse_args()
 
     _setup.load_profile()
@@ -343,7 +404,9 @@ def main() -> None:
     from jobfit.retrieval.rerank import get_reranker
 
     try:
-        commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
+        commit = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True
+        ).stdout.strip()
     except OSError:
         commit = ""
     meta = {
@@ -368,11 +431,16 @@ def main() -> None:
 
     out = _setup.RESULTS_DIR
     out.mkdir(exist_ok=True)
-    (out / f"{args.name}.json").write_text(json.dumps({"meta": meta, "results": results}, indent=2, ensure_ascii=False), encoding="utf-8")
+    (out / f"{args.name}.json").write_text(
+        json.dumps({"meta": meta, "results": results}, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
     md = to_markdown(results, meta)
     (out / f"{args.name}.md").write_text(md, encoding="utf-8")
     if results.get("fabrication_by_config"):
-        plot_fabrication(results["fabrication_by_config"], meta, out / f"{args.name}-fabrication.png")
+        plot_fabrication(
+            results["fabrication_by_config"], meta, out / f"{args.name}-fabrication.png"
+        )
     print("\n" + md)
 
 

@@ -14,7 +14,15 @@ from jobfit.retrieval import store
 from jobfit.schemas import Draft, JobRequirements
 
 MAX_POOL = 25
-LANGUAGE_NAMES = {"en": "English", "de": "German", "fr": "French", "es": "Spanish", "nl": "Dutch", "it": "Italian", "sv": "Swedish"}
+LANGUAGE_NAMES = {
+    "en": "English",
+    "de": "German",
+    "fr": "French",
+    "es": "Spanish",
+    "nl": "Dutch",
+    "it": "Italian",
+    "sv": "Swedish",
+}
 
 
 def build_evidence_pool(state: JobFitState) -> list[dict]:
@@ -25,7 +33,8 @@ def build_evidence_pool(state: JobFitState) -> list[dict]:
     for rid, items in (state.get("evidence") or {}).items():
         for e in items:
             entry = pool.setdefault(
-                e["chunk_id"], {"chunk_id": e["chunk_id"], "quote": e["quote"], "strength": 0.0, "supports": []}
+                e["chunk_id"],
+                {"chunk_id": e["chunk_id"], "quote": e["quote"], "strength": 0.0, "supports": []},
             )
             entry["strength"] = max(entry["strength"], e["strength"])
             entry["supports"].append(req_text.get(rid, rid))
@@ -66,7 +75,9 @@ def _revision_block(state: JobFitState) -> str:
     ]
     for v in verdicts:
         status = "SUPPORTED" if v["supported"] else f"UNSUPPORTED: {v['reason']}"
-        lines.append(f"- [{v['section']} #{v['index']}] {v['text']} (cites {', '.join(v['evidence_ids'])}) -> {status}")
+        lines.append(
+            f"- [{v['section']} #{v['index']}] {v['text']} (cites {', '.join(v['evidence_ids'])}) -> {status}"
+        )
     return "\n".join(lines)
 
 

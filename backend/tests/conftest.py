@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pytest
@@ -12,9 +13,33 @@ from jobfit.db import session as db_session
 SAMPLE_PROFILE = REPO_DIR / "sample_profile"
 
 
+CHECKPOINT_TABLES = (
+    "checkpoints",
+    "checkpoint_blobs",
+    "checkpoint_writes",
+    "checkpoint_migrations",
+)
+
+
+def _reset_postgres() -> None:
+    """Fresh tables for every test when running against a shared Postgres (CI)."""
+    from sqlalchemy import text
+
+    from jobfit.db.models import Base
+
+    engine = db_session.get_engine()
+    with engine.begin() as conn:
+        conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        for table in CHECKPOINT_TABLES:
+            conn.execute(text(f"DROP TABLE IF EXISTS {table} CASCADE"))
+    Base.metadata.drop_all(engine)
+
+
 @pytest.fixture(autouse=True)
 def isolated_settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{(tmp_path / 'test.db').as_posix()}")
+    # TEST_DATABASE_URL=postgresql+psycopg://... runs the suite against Postgres + pgvector.
+    pg_url = os.environ.get("TEST_DATABASE_URL")
+    monkeypatch.setenv("DATABASE_URL", pg_url or f"sqlite:///{(tmp_path / 'test.db').as_posix()}")
     monkeypatch.setenv("EXPORT_DIR", str(tmp_path / "exports"))
     monkeypatch.setenv("CHECKPOINT_DB", str(tmp_path / "checkpoints.db"))
     monkeypatch.setenv("LLM_PROVIDER", "heuristic")
@@ -24,6 +49,8 @@ def isolated_settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("JUDGE_API_KEY", "")
     _clear_caches()
     db_session.reset_engine()
+    if pg_url:
+        _reset_postgres()
     db_session.init_db()
     yield get_settings()
     db_session.reset_engine()

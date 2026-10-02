@@ -67,7 +67,9 @@ def build_docx(
     # --- header
     if name:
         doc.add_heading(name, level=0)
-    contact = " · ".join(v for k in ("headline", "email", "phone", "location", "links") if (v := profile.get(k)))
+    contact = " · ".join(
+        v for k in ("headline", "email", "phone", "location", "links") if (v := profile.get(k))
+    )
     if contact:
         p = doc.add_paragraph(contact)
         for run in p.runs:

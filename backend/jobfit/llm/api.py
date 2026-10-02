@@ -104,6 +104,8 @@ class OpenAICompatibleLLM(UsageTracker):
         )
         u = resp.usage
         self.record(
-            u.prompt_tokens if u else 0, u.completion_tokens if u else 0, time.perf_counter() - start
+            u.prompt_tokens if u else 0,
+            u.completion_tokens if u else 0,
+            time.perf_counter() - start,
         )
         return resp.choices[0].message.content or ""

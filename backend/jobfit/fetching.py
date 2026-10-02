@@ -173,7 +173,12 @@ def _personio(url: str, client: httpx.Client) -> FetchedJob | None:
             parts.append(f"## {(desc.findtext('name') or '').strip()}")
             parts.append(html_to_text(desc.findtext("value") or ""))
         return FetchedJob(
-            clean_text("\n\n".join(parts)), "personio", url, title=title, company=company, location=office
+            clean_text("\n\n".join(parts)),
+            "personio",
+            url,
+            title=title,
+            company=company,
+            location=office,
         )
     return None
 

@@ -51,7 +51,9 @@ def _evidence_text(chunk: Chunk) -> str:
     return "".join(parts) + ")"
 
 
-def deterministic_checks(section: str, s: DraftSentence, chunks: dict[str, Chunk], job_text: str) -> _Item:
+def deterministic_checks(
+    section: str, s: DraftSentence, chunks: dict[str, Chunk], job_text: str
+) -> _Item:
     failed: list[str] = []
     reasons: list[str] = []
     evidence: list[tuple[str, str]] = []
@@ -114,11 +116,11 @@ def judge_draft(
     `layers`: which checks to run. Always all of them in the app; the eval switches layers
     off to measure what each one contributes.
     """
-    all_ids = {i for _, _, s in iter_sentences(draft) for i in s.evidence_ids if i != JOB_EVIDENCE_ID}
-    chunks = store.get_chunks(sorted(all_ids))
-    cached = {
-        (v.section, v.text, tuple(v.evidence_ids)): v for v in (cache or []) if v.supported
+    all_ids = {
+        i for _, _, s in iter_sentences(draft) for i in s.evidence_ids if i != JOB_EVIDENCE_ID
     }
+    chunks = store.get_chunks(sorted(all_ids))
+    cached = {(v.section, v.text, tuple(v.evidence_ids)): v for v in (cache or []) if v.supported}
 
     verdicts: dict[tuple[str, int], Verdict] = {}
     to_llm: list[_Item] = []
@@ -147,8 +149,13 @@ def judge_draft(
             to_llm.append(item)
         else:
             verdicts[(section, i)] = Verdict(
-                section=section, index=i, text=s.text, evidence_ids=s.evidence_ids,
-                supported=True, p_supported=1.0, reason="passed the enabled checks",
+                section=section,
+                index=i,
+                text=s.text,
+                evidence_ids=s.evidence_ids,
+                supported=True,
+                p_supported=1.0,
+                reason="passed the enabled checks",
             )
 
     if to_llm:
@@ -191,5 +198,7 @@ def drop_unsupported(draft: Draft, verdicts: list[Verdict]) -> Draft:
     bad = {(v.section, v.index) for v in verdicts if not v.supported}
     return Draft(
         bullets=[s for i, s in enumerate(draft.bullets) if ("bullets", i) not in bad],
-        cover_letter=[s for i, s in enumerate(draft.cover_letter) if ("cover_letter", i) not in bad],
+        cover_letter=[
+            s for i, s in enumerate(draft.cover_letter) if ("cover_letter", i) not in bad
+        ],
     )

@@ -77,7 +77,9 @@ def _run_until_gaps(svc):
 
 
 def _req_id(state, startswith):
-    return next(r["id"] for r in state["requirements"]["requirements"] if r["text"].startswith(startswith))
+    return next(
+        r["id"] for r in state["requirements"]["requirements"] if r["text"].startswith(startswith)
+    )
 
 
 def test_pipeline_with_heuristic_llm(sample_profile):

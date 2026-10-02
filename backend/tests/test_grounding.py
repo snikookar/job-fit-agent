@@ -33,7 +33,13 @@ def _draft(bullets=(), letter=()) -> Draft:
 def _always_supported(ctx):
     return {
         "items": [
-            {"section": s["section"], "index": s["index"], "supported": True, "confidence": 0.9, "reason": "ok"}
+            {
+                "section": s["section"],
+                "index": s["index"],
+                "supported": True,
+                "confidence": 0.9,
+                "reason": "ok",
+            }
             for s in ctx["sentences"]
         ]
     }
@@ -86,8 +92,20 @@ def test_threshold_and_missing_verdicts(sample_profile):
     def judge_fn(ctx):
         return {
             "items": [
-                {"section": "bullets", "index": 0, "supported": True, "confidence": 0.9, "reason": "ok"},
-                {"section": "bullets", "index": 1, "supported": True, "confidence": 0.3, "reason": "unsure"},
+                {
+                    "section": "bullets",
+                    "index": 0,
+                    "supported": True,
+                    "confidence": 0.9,
+                    "reason": "ok",
+                },
+                {
+                    "section": "bullets",
+                    "index": 1,
+                    "supported": True,
+                    "confidence": 0.3,
+                    "reason": "unsure",
+                },
                 # index 2 missing on purpose
             ]
         }
@@ -141,7 +159,12 @@ def test_loop_fixes_unsupported_sentence_in_second_round(sample_profile):
     good = {"text": "Built an event pipeline with RabbitMQ.", "evidence_ids": [rabbit]}
     fake = {"text": "Ran Kubernetes in production for 5 years.", "evidence_ids": [rabbit]}
     writer_llm = ScriptedLLM(
-        {"write_draft": [{"bullets": [good, fake], "cover_letter": []}, {"bullets": [good], "cover_letter": []}]}
+        {
+            "write_draft": [
+                {"bullets": [good, fake], "cover_letter": []},
+                {"bullets": [good], "cover_letter": []},
+            ]
+        }
     )
     svc = Services(writer=writer_llm, judge=ScriptedLLM({"judge": [_always_supported]}))
     state = _state_until_gaps(svc)

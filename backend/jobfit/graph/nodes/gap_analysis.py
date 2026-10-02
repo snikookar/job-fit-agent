@@ -47,7 +47,9 @@ def gap_analysis(state: JobFitState, svc: Services) -> dict:
             text=r.text,
             importance=r.importance,
             best_strength=strength.get(r.id, 0.0),
-            suggestion=suggestions.get(r.id, "Add evidence for this to your profile if you have it."),
+            suggestion=suggestions.get(
+                r.id, "Add evidence for this to your profile if you have it."
+            ),
         )
         for r in weak
     ]

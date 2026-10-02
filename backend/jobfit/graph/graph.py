@@ -1,8 +1,8 @@
 """The LangGraph graph (see docs/SPEC.md, section 3).
 
-    fetch_job -> parse_requirements -> match_evidence -> score -> gap_analysis
-      -> writer -> grounding_judge --(unsupported, rounds left)--> writer
-                                   --(ok)--> human_review [interrupt] -> export -> END
+fetch_job -> parse_requirements -> match_evidence -> score -> gap_analysis
+  -> writer -> grounding_judge --(unsupported, rounds left)--> writer
+                               --(ok)--> human_review [interrupt] -> export -> END
 """
 
 from __future__ import annotations

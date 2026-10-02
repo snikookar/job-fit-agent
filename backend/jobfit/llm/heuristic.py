@@ -53,21 +53,74 @@ class HeuristicLLM(UsageTracker):
 # --- parse_requirements -------------------------------------------------------------
 
 _MUST_HEADINGS = (
-    "requirement", "qualification", "what you bring", "you bring", "you have", "must have",
-    "must-have", "your profile", "who you are", "looking for", "what we expect", "about you",
-    "your skills", "you'll need", "you will need", "skills", "dein profil", "ihr profil",
-    "anforderungen", "das bringst du mit", "was du mitbringst", "qualifikation",
+    "requirement",
+    "qualification",
+    "what you bring",
+    "you bring",
+    "you have",
+    "must have",
+    "must-have",
+    "your profile",
+    "who you are",
+    "looking for",
+    "what we expect",
+    "about you",
+    "your skills",
+    "you'll need",
+    "you will need",
+    "skills",
+    "dein profil",
+    "ihr profil",
+    "anforderungen",
+    "das bringst du mit",
+    "was du mitbringst",
+    "qualifikation",
 )
 _NICE_HEADINGS = (
-    "nice to have", "nice-to-have", "preferred", "bonus", "plus", "ideally", "good to have",
-    "would be great", "wünschenswert", "von vorteil", "optional",
+    "nice to have",
+    "nice-to-have",
+    "preferred",
+    "bonus",
+    "plus",
+    "ideally",
+    "good to have",
+    "would be great",
+    "wünschenswert",
+    "von vorteil",
+    "optional",
 )
 _OTHER_HEADINGS = (
-    "responsibilit", "what you'll do", "what you will do", "your role", "the role", "about us",
-    "about the", "benefits", "we offer", "what we offer", "perks", "why join", "aufgaben",
-    "was wir bieten", "deine aufgaben", "ihre aufgaben", "how to apply", "process", "tasks",
+    "responsibilit",
+    "what you'll do",
+    "what you will do",
+    "your role",
+    "the role",
+    "about us",
+    "about the",
+    "benefits",
+    "we offer",
+    "what we offer",
+    "perks",
+    "why join",
+    "aufgaben",
+    "was wir bieten",
+    "deine aufgaben",
+    "ihre aufgaben",
+    "how to apply",
+    "process",
+    "tasks",
 )
-_LANGUAGES = ("english", "german", "french", "spanish", "dutch", "italian", "swedish", "deutsch", "englisch")
+_LANGUAGES = (
+    "english",
+    "german",
+    "french",
+    "spanish",
+    "dutch",
+    "italian",
+    "swedish",
+    "deutsch",
+    "englisch",
+)
 YEARS_RE = re.compile(r"(\d+)\s*\+?\s*(?:(?:-|–|to)\s*\d+\s*)?(?:years?|yrs|jahre)", re.IGNORECASE)
 
 
@@ -126,7 +179,9 @@ def parse_requirements(ctx: dict[str, Any]) -> dict[str, Any]:
             continue
         lowered = bullet.lower()
         if section in ("must", "nice"):
-            nice = section == "nice" or any(k in lowered for k in ("a plus", "nice to have", "bonus", "preferred", "ideally"))
+            nice = section == "nice" or any(
+                k in lowered for k in ("a plus", "nice to have", "bonus", "preferred", "ideally")
+            )
             reqs.append((bullet, "nice" if nice else "must"))
 
     if not reqs:  # no recognizable sections: fall back to tech-ish bullets anywhere
@@ -158,7 +213,9 @@ def parse_requirements(ctx: dict[str, Any]) -> dict[str, Any]:
     else:
         remote = "unknown"
 
-    if re.search(r"(no|not|unable to|cannot|can't)\s+(offer\s+|provide\s+)?visa sponsorship", lowered):
+    if re.search(
+        r"(no|not|unable to|cannot|can't)\s+(offer\s+|provide\s+)?visa sponsorship", lowered
+    ):
         visa = "no"
     elif re.search(r"visa sponsorship|relocation (support|package)|we sponsor", lowered):
         visa = "yes"
@@ -168,7 +225,9 @@ def parse_requirements(ctx: dict[str, Any]) -> dict[str, Any]:
     first_line = next((ln.strip("# ").strip() for ln in lines if ln.strip()), "Untitled position")
     company = ctx.get("company_hint")
     if not company:
-        m = re.search(r"\b(?:at|join|About)[ \t]+([A-Z][\w&.\-]+(?:[ \t]+[A-Z][\w&.\-]+){0,3})", text)
+        m = re.search(
+            r"\b(?:at|join|About)[ \t]+([A-Z][\w&.\-]+(?:[ \t]+[A-Z][\w&.\-]+){0,3})", text
+        )
         company = m.group(1) if m else None
     location = ctx.get("location_hint")
     if not location:
@@ -187,7 +246,9 @@ def parse_requirements(ctx: dict[str, Any]) -> dict[str, Any]:
 
 # --- assess_evidence ----------------------------------------------------------------
 
-NEGATION_RE = re.compile(r"\b(not|never|no|without|haven't|hasn't|didn't|nicht|kein\w*)\b", re.IGNORECASE)
+NEGATION_RE = re.compile(
+    r"\b(not|never|no|without|haven't|hasn't|didn't|nicht|kein\w*)\b", re.IGNORECASE
+)
 LEARNING_RE = re.compile(r"\b(learning|course|tutorial|experimented|notes)\b", re.IGNORECASE)
 _YEAR_RE = re.compile(r"\b(?:19|20)\d{2}\b")
 
@@ -236,11 +297,17 @@ def assess_evidence(ctx: dict[str, Any]) -> dict[str, Any]:
                 support = "none"  # "I have not run Kubernetes in production"
             elif req_tags:
                 tag_ratio = len(req_tags & chunk_tags) / len(req_tags)
-                support = "full" if tag_ratio == 1 else "partial" if tag_ratio > 0 else (
-                    "partial" if term_ratio >= 0.5 else "none"
+                support = (
+                    "full"
+                    if tag_ratio == 1
+                    else "partial"
+                    if tag_ratio > 0
+                    else ("partial" if term_ratio >= 0.5 else "none")
                 )
             else:
-                support = "full" if term_ratio >= 0.6 else "partial" if term_ratio >= 0.3 else "none"
+                support = (
+                    "full" if term_ratio >= 0.6 else "partial" if term_ratio >= 0.3 else "none"
+                )
 
             if support == "full":
                 span = span_years(c.get("date_range"))
@@ -253,7 +320,12 @@ def assess_evidence(ctx: dict[str, Any]) -> dict[str, Any]:
 
             quote = _best_sentence(text, req_terms, req_tags) if support != "none" else ""
             items.append(
-                {"requirement_id": p["requirement_id"], "chunk_id": c["chunk_id"], "support": support, "quote": quote}
+                {
+                    "requirement_id": p["requirement_id"],
+                    "chunk_id": c["chunk_id"],
+                    "support": support,
+                    "quote": quote,
+                }
             )
     return {"items": items}
 
@@ -267,7 +339,7 @@ def gap_suggestions(ctx: dict[str, Any]) -> dict[str, Any]:
     for g in ctx["gaps"]:
         if g["importance"] == "must":
             text = (
-                f"Must-have with little evidence: \"{g['requirement']}\". If you have this experience, "
+                f'Must-have with little evidence: "{g["requirement"]}". If you have this experience, '
                 "add it to your resume or a project write-up so it can be cited. Otherwise, build it "
                 "with a small project and address it openly in your cover letter."
             )
@@ -282,11 +354,25 @@ def gap_suggestions(ctx: dict[str, Any]) -> dict[str, Any]:
 
 # --- write_draft ----------------------------------------------------------------------
 
-_PAST_VERBS = {"built", "led", "ran", "wrote", "made", "set", "took", "drove", "grew", "won", "taught"}
+_PAST_VERBS = {
+    "built",
+    "led",
+    "ran",
+    "wrote",
+    "made",
+    "set",
+    "took",
+    "drove",
+    "grew",
+    "won",
+    "taught",
+}
 
 
 def _clean_quote(text: str) -> str:
-    text = " ".join(line.strip().lstrip("-*• ").strip() for line in text.splitlines() if line.strip())
+    text = " ".join(
+        line.strip().lstrip("-*• ").strip() for line in text.splitlines() if line.strip()
+    )
     return text if text.endswith((".", "!", "?")) else text + "."
 
 
@@ -325,25 +411,32 @@ def write_draft(ctx: dict[str, Any]) -> dict[str, Any]:
         ),
     )
     bullets = [
-        {"text": _clean_quote(e["quote"]), "evidence_ids": [e["chunk_id"]]}
-        for e in ranked[:6]
+        {"text": _clean_quote(e["quote"]), "evidence_ids": [e["chunk_id"]]} for e in ranked[:6]
     ]
 
     letter = [
-        {"text": f"I am applying for the {job['title']} position at {company}.", "evidence_ids": [JOB_EVIDENCE_ID]}
+        {
+            "text": f"I am applying for the {job['title']} position at {company}.",
+            "evidence_ids": [JOB_EVIDENCE_ID],
+        }
     ]
     for e in ranked[:3]:
-        letter.append({"text": _first_person(_clean_quote(e["quote"])), "evidence_ids": [e["chunk_id"]]})
+        letter.append(
+            {"text": _first_person(_clean_quote(e["quote"])), "evidence_ids": [e["chunk_id"]]}
+        )
     must_gaps = [g for g in ctx.get("gaps") or [] if g["importance"] == "must"]
     if must_gaps:
         letter.append(
             {
-                "text": f"One requirement I have not yet fully met is \"{must_gaps[0]['text']}\", and I am keen to build it.",
+                "text": f'One requirement I have not yet fully met is "{must_gaps[0]["text"]}", and I am keen to build it.',
                 "evidence_ids": [JOB_EVIDENCE_ID],
             }
         )
     letter.append(
-        {"text": f"I would welcome the chance to discuss how I can contribute to {company}.", "evidence_ids": [JOB_EVIDENCE_ID]}
+        {
+            "text": f"I would welcome the chance to discuss how I can contribute to {company}.",
+            "evidence_ids": [JOB_EVIDENCE_ID],
+        }
     )
     return {"bullets": bullets, "cover_letter": letter}
 
@@ -352,9 +445,33 @@ def write_draft(ctx: dict[str, Any]) -> dict[str, Any]:
 
 # Words that carry no factual claim in application prose.
 _PROSE_WORDS = {
-    "applying", "position", "role", "company", "chance", "discuss", "contribute", "welcome",
-    "keen", "excited", "believe", "profile", "includes", "work", "my", "built", "help", "helped",
-    "would", "like", "glad", "happy", "opportunity", "bring", "apply", "relevant", "fit",
+    "applying",
+    "position",
+    "role",
+    "company",
+    "chance",
+    "discuss",
+    "contribute",
+    "welcome",
+    "keen",
+    "excited",
+    "believe",
+    "profile",
+    "includes",
+    "work",
+    "my",
+    "built",
+    "help",
+    "helped",
+    "would",
+    "like",
+    "glad",
+    "happy",
+    "opportunity",
+    "bring",
+    "apply",
+    "relevant",
+    "fit",
 }
 CLAIM_RE = re.compile(
     r"\b(built|led|developed|designed|implemented|deployed|managed|created|shipped|delivered|"
@@ -380,25 +497,44 @@ def judge(ctx: dict[str, Any]) -> dict[str, Any]:
             claim = CLAIM_RE.search(text) and not NEGATION_RE.search(text)
             unknown_tags = tags - set(extract_tech_tags(job_ev))
             if claim:
-                items.append(_verdict(s, False, 0.85, "claims experience but cites only the job posting"))
+                items.append(
+                    _verdict(s, False, 0.85, "claims experience but cites only the job posting")
+                )
             elif unknown_tags:
-                items.append(_verdict(s, False, 0.8, f"mentions {', '.join(sorted(unknown_tags))}, which is not in the job posting"))
+                items.append(
+                    _verdict(
+                        s,
+                        False,
+                        0.8,
+                        f"mentions {', '.join(sorted(unknown_tags))}, which is not in the job posting",
+                    )
+                )
             else:
                 items.append(_verdict(s, True, 0.8, "statement about the role, no candidate claim"))
             continue
 
         missing_tags = tags - set(extract_tech_tags(profile_ev))
         if missing_tags:
-            items.append(_verdict(s, False, 0.9, f"{', '.join(sorted(missing_tags))} not in the cited evidence"))
+            items.append(
+                _verdict(
+                    s, False, 0.9, f"{', '.join(sorted(missing_tags))} not in the cited evidence"
+                )
+            )
             continue
         terms = content_terms(text) - _PROSE_WORDS
         ev_terms = content_terms(profile_ev + " " + job_ev)
         coverage = len(terms & ev_terms) / len(terms) if terms else 1.0
         if coverage >= 0.6:
-            items.append(_verdict(s, True, 0.5 + coverage / 2, "content matches the cited evidence"))
+            items.append(
+                _verdict(s, True, 0.5 + coverage / 2, "content matches the cited evidence")
+            )
         else:
             missing = sorted(terms - ev_terms)[:5]
-            items.append(_verdict(s, False, 0.5 + (1 - coverage) / 2, f"not in the evidence: {', '.join(missing)}"))
+            items.append(
+                _verdict(
+                    s, False, 0.5 + (1 - coverage) / 2, f"not in the evidence: {', '.join(missing)}"
+                )
+            )
     return {"items": items}
 
 

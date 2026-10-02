@@ -1,3 +1,5 @@
+# docker compose up --build   ->  http://localhost:3000
+# Ports are bound to 127.0.0.1 on purpose: this app holds your resume and has no login.
 services:
   db:
     image: pgvector/pgvector:pg17
@@ -6,7 +8,7 @@ services:
       POSTGRES_PASSWORD: jobfit
       POSTGRES_DB: jobfit
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -15,5 +17,39 @@ services:
       timeout: 3s
       retries: 10
 
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      args:
+        # "--extra ml" for bge-m3 + bge-reranker (adds ~2 GB, CPU is fine for a personal profile)
+        EXTRAS: ""
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+psycopg://jobfit:jobfit@db:5432/jobfit
+      EXPORT_DIR: /data/exports
+    volumes:
+      - exports:/data/exports
+      - hf-cache:/root/.cache/huggingface # downloaded models survive rebuilds
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - backend
+
 volumes:
   pgdata:
+  exports:
+  hf-cache:

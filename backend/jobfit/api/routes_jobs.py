@@ -60,7 +60,9 @@ def _run_row(run_id: str) -> dict | None:
 @router.post("", status_code=202)
 def create_job(job: JobIn, request: Request):
     run_id = uuid.uuid4().hex[:12]
-    _manager(request).start(run_id, (job.url or "").strip() or None, (job.text or "").strip() or None)
+    _manager(request).start(
+        run_id, (job.url or "").strip() or None, (job.text or "").strip() or None
+    )
     return {"run_id": run_id}
 
 
@@ -84,12 +86,21 @@ def get_job(run_id: str, request: Request):
         ids |= {e["chunk_id"] for e in items}
     for key in ("draft", "final_draft"):
         if state.get(key):
-            ids |= {i for _, _, s in iter_sentences(Draft.model_validate(state[key])) for i in s.evidence_ids}
+            ids |= {
+                i
+                for _, _, s in iter_sentences(Draft.model_validate(state[key]))
+                for i in s.evidence_ids
+            }
     for v in state.get("removed") or []:
         ids |= set(v.get("evidence_ids") or [])
     ids.discard(JOB_EVIDENCE_ID)
     chunks = {cid: c.model_dump() for cid, c in store.get_chunks(sorted(ids)).items()}
-    return {"run": run, "state": state, "chunks": chunks, "active": _manager(request).is_active(run_id)}
+    return {
+        "run": run,
+        "state": state,
+        "chunks": chunks,
+        "active": _manager(request).is_active(run_id),
+    }
 
 
 @router.get("/{run_id}/events")
@@ -137,7 +148,9 @@ def download_docx(run_id: str, request: Request):
     if not path or not Path(path).exists():
         raise HTTPException(404, "no document for this run (approve the draft first)")
     title = (state.get("requirements") or {}).get("title") or "application"
-    safe = "".join(ch if ch.isalnum() or ch in " -_" else "_" for ch in title).strip() or "application"
+    safe = (
+        "".join(ch if ch.isalnum() or ch in " -_" else "_" for ch in title).strip() or "application"
+    )
     return FileResponse(
         path,
         filename=f"{safe}.docx",

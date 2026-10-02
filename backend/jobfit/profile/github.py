@@ -17,14 +17,18 @@ def _client(token: str = "") -> httpx.Client:
 def list_repos(user: str, token: str = "", limit: int = 30) -> list[str]:
     """The user's own (non-fork) public repos, most recently pushed first."""
     with _client(token) as c:
-        r = c.get(f"/users/{user}/repos", params={"per_page": 100, "sort": "pushed", "type": "owner"})
+        r = c.get(
+            f"/users/{user}/repos", params={"per_page": 100, "sort": "pushed", "type": "owner"}
+        )
         r.raise_for_status()
         return [repo["full_name"] for repo in r.json() if not repo.get("fork")][:limit]
 
 
 def fetch_readme(full_name: str, token: str = "") -> str | None:
     with _client(token) as c:
-        r = c.get(f"/repos/{full_name}/readme", headers={"Accept": "application/vnd.github.raw+json"})
+        r = c.get(
+            f"/repos/{full_name}/readme", headers={"Accept": "application/vnd.github.raw+json"}
+        )
         if r.status_code == 404:
             return None
         r.raise_for_status()

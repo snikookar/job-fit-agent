@@ -19,10 +19,28 @@ STOPWORDS = frozenset(
 NUMBER_RE = re.compile(r"(?<![\w.])(\d+(?:[.,]\d+)?)(\s*%|\+)?")
 NUMBER_WORDS = {
     # "one" is left out on purpose: "one of", "one area" are far more common than "one year".
-    "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "seven": "7",
-    "eight": "8", "nine": "9", "ten": "10", "eleven": "11", "twelve": "12", "fifteen": "15",
-    "twenty": "20", "thirty": "30", "fifty": "50", "hundred": "100",
-    "dozen": "12", "zwei": "2", "drei": "3", "vier": "4", "fünf": "5", "zehn": "10",
+    "two": "2",
+    "three": "3",
+    "four": "4",
+    "five": "5",
+    "six": "6",
+    "seven": "7",
+    "eight": "8",
+    "nine": "9",
+    "ten": "10",
+    "eleven": "11",
+    "twelve": "12",
+    "fifteen": "15",
+    "twenty": "20",
+    "thirty": "30",
+    "fifty": "50",
+    "hundred": "100",
+    "dozen": "12",
+    "zwei": "2",
+    "drei": "3",
+    "vier": "4",
+    "fünf": "5",
+    "zehn": "10",
 }
 _NUMBER_WORD_RE = re.compile(r"\b(" + "|".join(NUMBER_WORDS) + r")\b", re.IGNORECASE)
 
