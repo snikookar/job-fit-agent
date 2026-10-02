@@ -1,0 +1,29 @@
+id: rust-systems-zurich
+fit_rating: 1
+text: |
+  # Systems Engineer (Rust)
+
+  Location: Zurich, Switzerland (onsite)
+
+  Glacierdb is building a new storage engine.
+
+  ## Requirements
+
+  - 3+ years of professional Rust experience
+  - Strong background in systems programming
+  - Knowledge of Linux internals (memory, I/O, scheduling)
+  - Experience with C++
+
+  ## Nice to have
+
+  - Experience with embedded systems
+  - Contributions to open-source databases
+
+  We are unable to offer visa sponsorship.
+gold:
+  - { text: "3+ years of professional Rust experience", importance: must }
+  - { text: "Strong background in systems programming", importance: must }
+  - { text: "Knowledge of Linux internals (memory, I/O, scheduling)", importance: must }
+  - { text: "Experience with C++", importance: must }
+  - { text: "Experience with embedded systems", importance: nice }
+  - { text: "Contributions to open-source databases", importance: nice }

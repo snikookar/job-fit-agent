@@ -1,0 +1,33 @@
+id: data-engineer-amsterdam
+fit_rating: 3
+text: |
+  # Data Engineer
+
+  Location: Amsterdam, Netherlands
+
+  Tulipwise helps grocery chains reduce food waste with data.
+
+  ## Requirements
+
+  - 3+ years of experience building data pipelines
+  - Experience with Apache Airflow
+  - Strong SQL skills
+  - Python for data processing
+  - Experience with Apache Spark
+  - Experience implementing data quality checks
+
+  ## Nice to have
+
+  - Experience with dbt
+  - Experience with Snowflake or BigQuery
+  - Dutch language skills
+gold:
+  - { text: "3+ years of experience building data pipelines", importance: must }
+  - { text: "Experience with Apache Airflow", importance: must }
+  - { text: "Strong SQL skills", importance: must }
+  - { text: "Python for data processing", importance: must }
+  - { text: "Experience with Apache Spark", importance: must }
+  - { text: "Experience implementing data quality checks", importance: must }
+  - { text: "Experience with dbt", importance: nice }
+  - { text: "Experience with Snowflake or BigQuery", importance: nice }
+  - { text: "Dutch language skills", importance: nice }

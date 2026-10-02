@@ -1,0 +1,29 @@
+id: frontend-react-berlin
+fit_rating: 2
+text: |
+  # Senior Frontend Engineer
+
+  Location: Berlin, Germany (remote within the EU)
+
+  Pixelmoss builds design tools for small agencies.
+
+  ## You bring
+
+  - 4+ years of experience with React and TypeScript
+  - Excellent CSS skills and a strong eye for detail
+  - Experience with Next.js
+  - Experience with web accessibility (WCAG)
+  - Experience testing UIs with Jest and Playwright
+
+  ## Nice to have
+
+  - Experience building a design system
+  - Experience with GraphQL
+gold:
+  - { text: "4+ years of experience with React and TypeScript", importance: must }
+  - { text: "Excellent CSS skills and a strong eye for detail", importance: must }
+  - { text: "Experience with Next.js", importance: must }
+  - { text: "Experience with web accessibility (WCAG)", importance: must }
+  - { text: "Experience testing UIs with Jest and Playwright", importance: must }
+  - { text: "Experience building a design system", importance: nice }
+  - { text: "Experience with GraphQL", importance: nice }

@@ -1,0 +1,29 @@
+id: java-spring-frankfurt
+fit_rating: 1
+text: |
+  # Java Developer (Payments)
+
+  Location: Frankfurt, Germany
+
+  Mainbank Tech builds payment infrastructure for regional banks.
+
+  ## Your profile
+
+  - 5+ years of experience with Java
+  - Experience with Spring Boot
+  - Experience with Kafka
+  - Experience with Oracle or other relational databases
+  - Experience with microservice architectures
+  - Fluent German
+
+  ## Nice to have
+
+  - Experience with Kubernetes
+gold:
+  - { text: "5+ years of experience with Java", importance: must }
+  - { text: "Experience with Spring Boot", importance: must }
+  - { text: "Experience with Kafka", importance: must }
+  - { text: "Experience with Oracle or other relational databases", importance: must }
+  - { text: "Experience with microservice architectures", importance: must }
+  - { text: "Fluent German", importance: must }
+  - { text: "Experience with Kubernetes", importance: nice }

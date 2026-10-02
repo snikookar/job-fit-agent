@@ -1,0 +1,27 @@
+id: ml-research-paris
+fit_rating: 2
+text: |
+  # Research Scientist, Machine Learning
+
+  Location: Paris, France
+
+  Lumen Labs does fundamental research on efficient language models.
+
+  ## Qualifications
+
+  - PhD in machine learning or a related field
+  - Publications at NeurIPS, ICML or ICLR
+  - Expert knowledge of PyTorch
+  - Experience with deep learning research
+
+  ## Ideally
+
+  - Experience with large-scale distributed training
+  - French language skills
+gold:
+  - { text: "PhD in machine learning or a related field", importance: must }
+  - { text: "Publications at NeurIPS, ICML or ICLR", importance: must }
+  - { text: "Expert knowledge of PyTorch", importance: must }
+  - { text: "Experience with deep learning research", importance: must }
+  - { text: "Experience with large-scale distributed training", importance: nice }
+  - { text: "French language skills", importance: nice }

@@ -1,0 +1,31 @@
+id: devops-k8s-vienna
+fit_rating: 2
+text: |
+  # Platform Engineer (Kubernetes)
+
+  Location: Vienna, Austria
+
+  Alpenbyte runs a multi-tenant SaaS platform on Kubernetes.
+
+  ## Requirements
+
+  - 3+ years of running Kubernetes in production
+  - Infrastructure as code with Terraform
+  - Experience with AWS or GCP
+  - Monitoring with Prometheus and Grafana
+  - Strong Linux administration skills
+  - Experience building CI/CD pipelines
+
+  ## Preferred
+
+  - Experience writing Helm charts
+  - Programming experience in Go
+gold:
+  - { text: "3+ years of running Kubernetes in production", importance: must }
+  - { text: "Infrastructure as code with Terraform", importance: must }
+  - { text: "Experience with AWS or GCP", importance: must }
+  - { text: "Monitoring with Prometheus and Grafana", importance: must }
+  - { text: "Strong Linux administration skills", importance: must }
+  - { text: "Experience building CI/CD pipelines", importance: must }
+  - { text: "Experience writing Helm charts", importance: nice }
+  - { text: "Programming experience in Go", importance: nice }

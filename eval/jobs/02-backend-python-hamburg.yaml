@@ -1,0 +1,38 @@
+id: backend-python-hamburg
+fit_rating: 5
+text: |
+  # Senior Backend Engineer (Python)
+
+  Location: Hamburg, Germany
+
+  At Harborline we build software for container terminals.
+
+  ## What you'll do
+
+  - Own services that process millions of container movements
+  - Improve reliability and performance of our APIs
+
+  ## What we're looking for
+
+  - 5+ years of backend development experience
+  - Strong Python skills with Django or FastAPI
+  - Deep knowledge of PostgreSQL, including query optimization
+  - Experience designing REST APIs
+  - Experience with message queues such as RabbitMQ or Kafka
+  - Experience with Docker
+
+  ## Bonus
+
+  - Experience with AWS
+  - Infrastructure as code with Terraform
+
+  We offer visa sponsorship and relocation support.
+gold:
+  - { text: "5+ years of backend development experience", importance: must }
+  - { text: "Strong Python skills with Django or FastAPI", importance: must }
+  - { text: "Deep knowledge of PostgreSQL, including query optimization", importance: must }
+  - { text: "Experience designing REST APIs", importance: must }
+  - { text: "Experience with message queues such as RabbitMQ or Kafka", importance: must }
+  - { text: "Experience with Docker", importance: must }
+  - { text: "Experience with AWS", importance: nice }
+  - { text: "Infrastructure as code with Terraform", importance: nice }

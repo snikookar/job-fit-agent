@@ -25,6 +25,7 @@ from jobfit.schemas import JOB_EVIDENCE_ID, Chunk, Draft, DraftSentence, JudgeRe
 from jobfit.textutil import extract_numbers
 
 SECTIONS = ("bullets", "cover_letter")
+ALL_LAYERS = frozenset({"citations", "numbers", "llm"})
 
 
 @dataclass
@@ -104,11 +105,14 @@ def judge_draft(
     threshold: float = 0.5,
     cache: list[Verdict] | None = None,
     only: set[tuple[str, int]] | None = None,
+    layers: frozenset[str] = ALL_LAYERS,
 ) -> list[Verdict]:
     """Return one Verdict per sentence (or per sentence in `only`).
 
     `cache`: verdicts from the previous round; a supported sentence that is unchanged
     (same text, same citations) is not sent to the LLM again.
+    `layers`: which checks to run. Always all of them in the app; the eval switches layers
+    off to measure what each one contributes.
     """
     all_ids = {i for _, _, s in iter_sentences(draft) for i in s.evidence_ids if i != JOB_EVIDENCE_ID}
     chunks = store.get_chunks(sorted(all_ids))
@@ -127,7 +131,8 @@ def judge_draft(
             continue
         item = deterministic_checks(section, s, chunks, job_text)
         item.index = i
-        if item.failed:
+        failed = [(f, r) for f, r in zip(item.failed, item.reasons, strict=True) if f in layers]
+        if failed:
             verdicts[(section, i)] = Verdict(
                 section=section,
                 index=i,
@@ -135,11 +140,16 @@ def judge_draft(
                 evidence_ids=s.evidence_ids,
                 supported=False,
                 p_supported=0.0,
-                reason="; ".join(item.reasons),
-                checks=item.failed,
+                reason="; ".join(r for _, r in failed),
+                checks=[f for f, _ in failed],
             )
-        else:
+        elif "llm" in layers:
             to_llm.append(item)
+        else:
+            verdicts[(section, i)] = Verdict(
+                section=section, index=i, text=s.text, evidence_ids=s.evidence_ids,
+                supported=True, p_supported=1.0, reason="passed the enabled checks",
+            )
 
     if to_llm:
         system, user = render("judge", sentences=_format_for_judge(to_llm))

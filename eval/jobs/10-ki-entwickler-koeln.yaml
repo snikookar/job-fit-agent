@@ -1,0 +1,36 @@
+# German-language posting. Gold requirements list a German and an English variant:
+# the LLM writes requirements in English, the offline heuristic keeps the original text.
+id: ki-entwickler-koeln
+fit_rating: 4
+text: |
+  # KI-Entwickler (m/w/d)
+
+  Standort: Köln (hybrid)
+
+  Rheinwerk Digital entwickelt KI-Lösungen für Versicherungen.
+
+  ## Deine Aufgaben
+
+  - Entwicklung von LLM-Anwendungen für unsere Kunden
+  - Betrieb und Weiterentwicklung unserer Plattform
+
+  ## Das bringst du mit
+
+  - Mehrjährige Erfahrung mit Python
+  - Erfahrung mit LLMs und RAG
+  - Kenntnisse in PostgreSQL
+  - Erfahrung mit Docker
+  - Sehr gute Deutsch- und Englischkenntnisse
+
+  ## Wünschenswert
+
+  - Erfahrung mit LangChain oder LangGraph
+  - Erfahrung mit Microsoft Azure
+gold:
+  - { text: ["Mehrjährige Erfahrung mit Python", "Several years of experience with Python"], importance: must }
+  - { text: ["Erfahrung mit LLMs und RAG", "Experience with LLMs and RAG"], importance: must }
+  - { text: ["Kenntnisse in PostgreSQL", "Knowledge of PostgreSQL"], importance: must }
+  - { text: ["Erfahrung mit Docker", "Experience with Docker"], importance: must }
+  - { text: ["Sehr gute Deutsch- und Englischkenntnisse", "Very good German and English skills"], importance: must }
+  - { text: ["Erfahrung mit LangChain oder LangGraph", "Experience with LangChain or LangGraph"], importance: nice }
+  - { text: ["Erfahrung mit Microsoft Azure", "Experience with Microsoft Azure"], importance: nice }

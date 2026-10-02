@@ -1,0 +1,37 @@
+# Synthetic posting (fictional company), written and labeled by hand for the eval.
+id: llm-engineer-munich
+fit_rating: 5 # human rating 1-5 of how well the sample profile (Mira) fits
+text: |
+  # LLM Engineer
+
+  Location: Munich, Germany (hybrid)
+
+  Brightloom is building an AI assistant for insurance claims.
+
+  ## Your tasks
+
+  - Design and ship LLM features end to end
+  - Build evaluation pipelines for our assistants
+
+  ## Requirements
+
+  - 3+ years of professional Python experience
+  - Hands-on experience with LLM APIs and prompt engineering
+  - Experience building retrieval-augmented generation (RAG) systems
+  - Experience evaluating LLM systems (offline metrics, test sets)
+  - Experience with FastAPI or a similar web framework
+
+  ## Nice to have
+
+  - Experience with LangGraph or other agent frameworks
+  - Experience with vector databases
+  - German language skills
+gold:
+  - { text: "3+ years of professional Python experience", importance: must }
+  - { text: "Hands-on experience with LLM APIs and prompt engineering", importance: must }
+  - { text: "Experience building retrieval-augmented generation (RAG) systems", importance: must }
+  - { text: "Experience evaluating LLM systems (offline metrics, test sets)", importance: must }
+  - { text: "Experience with FastAPI or a similar web framework", importance: must }
+  - { text: "Experience with LangGraph or other agent frameworks", importance: nice }
+  - { text: "Experience with vector databases", importance: nice }
+  - { text: "German language skills", importance: nice }

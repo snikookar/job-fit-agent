@@ -1,0 +1,40 @@
+{"query": "Experience with message queues", "expected": ["RabbitMQ"]}
+{"query": "Infrastructure as code", "expected": ["Terraform"]}
+{"query": "Workflow orchestration for batch jobs", "expected": ["Airflow"]}
+{"query": "Distributed tracing and observability", "expected": ["OpenTelemetry"]}
+{"query": "Mentoring junior developers", "expected": ["Mentored two junior"]}
+{"query": "Database query performance tuning", "expected": ["Optimized slow PostgreSQL"]}
+{"query": "Built LLM applications grounded in company documents", "expected": ["retrieval-augmented generation"]}
+{"query": "Evaluating retrieval and answer quality", "expected": ["evaluation harness"]}
+{"query": "Fine-tuning transformer models", "expected": ["fine-tuned DistilBERT", "BERT bi-encoder"]}
+{"query": "Human approval before automated actions", "expected": ["human approval step"]}
+{"query": "Caching LLM responses to save costs", "expected": ["semantic cache"]}
+{"query": "Frontend development with React", "expected": ["React and TypeScript"]}
+{"query": "German language skills", "expected": ["German (B2)"]}
+{"query": "Master's degree in computer science", "expected": ["M.Sc. Computer Science"]}
+{"query": "Time series forecasting", "expected": ["grocery prices", "LightGBM"]}
+{"query": "Cloud deployment on AWS", "expected": ["AWS (ECS, RDS, S3)"]}
+{"query": "Automated testing with pytest", "expected": ["pytest"]}
+{"query": "Data cleaning with pandas", "expected": ["pandas for sensor data"]}
+{"query": "Building internal dashboards", "expected": ["dashboards in React"]}
+{"query": "Exposing service metrics to Prometheus", "expected": ["Prometheus metrics"]}
+{"query": "Kubernetes", "expected": ["Kubernetes"]}
+{"query": "Text classification with machine learning", "expected": ["Classifies incoming tickets"]}
+{"query": "Hybrid search combining keyword and vector retrieval", "expected": ["BM25"]}
+{"query": "CI pipelines with GitHub Actions", "expected": ["GitHub Actions"]}
+{"query": "Containerizing applications", "expected": ["Containerized all services"]}
+{"query": "Reducing API latency", "expected": ["p95 API latency"]}
+{"query": "Incident response and reliability", "expected": ["mean time to resolution"]}
+{"query": "ETL pipelines", "expected": ["batch ETL jobs"]}
+{"query": "Event-driven architecture", "expected": ["event pipeline with RabbitMQ"]}
+{"query": "Running code review sessions", "expected": ["code review sessions"]}
+{"query": "Information retrieval background", "expected": ["information retrieval", "Dense passage retrieval"]}
+{"query": "Asynchronous Python", "expected": ["asyncpg"]}
+{"query": "Swedish speaker", "expected": ["Swedish (native)"]}
+{"query": "Django REST Framework", "expected": ["Django REST Framework"]}
+{"query": "Automated reporting with SQL", "expected": ["weekly reports"]}
+{"query": "Agent frameworks such as LangGraph", "expected": ["LangGraph"]}
+{"query": "AI features with measurable business impact", "expected": ["ticket handling time", "accepted with minor edits"]}
+{"query": "High-traffic APIs", "expected": ["1.2 million requests"]}
+{"query": "Integration testing with real dependencies", "expected": ["Testcontainers"]}
+{"query": "Deep learning with PyTorch", "expected": ["PyTorch"]}

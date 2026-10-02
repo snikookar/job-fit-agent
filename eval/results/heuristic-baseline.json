@@ -1,0 +1,215 @@
+{
+  "meta": {
+    "date": "2026-10-02 15:20 UTC",
+    "commit": "21151c2",
+    "writer": "writer:heuristic",
+    "judge": "judge:heuristic",
+    "embedder": "hash",
+    "reranker": "lexical",
+    "jobs": 10
+  },
+  "results": {
+    "extraction_precision": 1.0,
+    "extraction_recall": 1.0,
+    "extraction_f1": 1.0,
+    "importance_accuracy": 1.0,
+    "score_spearman": 0.836,
+    "latency_mean_s": 0.27,
+    "latency_p95_s": 0.57,
+    "llm_calls_mean": 5,
+    "tokens_mean": 0,
+    "jobs": [
+      {
+        "id": "llm-engineer-munich",
+        "fit_rating": 5,
+        "score": 78.5,
+        "predicted": 8,
+        "gold": 8,
+        "matched": 8,
+        "writer_rounds": 1,
+        "removed_sentences": 0,
+        "seconds": 0.57
+      },
+      {
+        "id": "backend-python-hamburg",
+        "fit_rating": 5,
+        "score": 71.1,
+        "predicted": 8,
+        "gold": 8,
+        "matched": 8,
+        "writer_rounds": 1,
+        "removed_sentences": 0,
+        "seconds": 0.29
+      },
+      {
+        "id": "data-engineer-amsterdam",
+        "fit_rating": 3,
+        "score": 68.4,
+        "predicted": 9,
+        "gold": 9,
+        "matched": 9,
+        "writer_rounds": 1,
+        "removed_sentences": 0,
+        "seconds": 0.27
+      },
+      {
+        "id": "frontend-react-berlin",
+        "fit_rating": 2,
+        "score": 25.0,
+        "predicted": 7,
+        "gold": 7,
+        "matched": 7,
+        "writer_rounds": 1,
+        "removed_sentences": 0,
+        "seconds": 0.22
+      },
+      {
+        "id": "devops-k8s-vienna",
+        "fit_rating": 2,
+        "score": 60.1,
+        "predicted": 8,
+        "gold": 8,
+        "matched": 8,
+        "writer_rounds": 1,
+        "removed_sentences": 0,
+        "seconds": 0.28
+      },
+      {
+        "id": "rust-systems-zurich",
+        "fit_rating": 1,
+        "score": 11.3,
+        "predicted": 6,
+        "gold": 6,
+        "matched": 6,
+        "writer_rounds": 1,
+        "removed_sentences": 0,
+        "seconds": 0.19
+      },
+      {
+        "id": "ml-research-paris",
+        "fit_rating": 2,
+        "score": 30.5,
+        "predicted": 6,
+        "gold": 6,
+        "matched": 6,
+        "writer_rounds": 1,
+        "removed_sentences": 0,
+        "seconds": 0.21
+      },
+      {
+        "id": "fullstack-lisbon",
+        "fit_rating": 3,
+        "score": 90.0,
+        "predicted": 6,
+        "gold": 6,
+        "matched": 6,
+        "writer_rounds": 1,
+        "removed_sentences": 0,
+        "seconds": 0.24
+      },
+      {
+        "id": "java-spring-frankfurt",
+        "fit_rating": 1,
+        "score": 28.5,
+        "predicted": 7,
+        "gold": 7,
+        "matched": 7,
+        "writer_rounds": 1,
+        "removed_sentences": 0,
+        "seconds": 0.2
+      },
+      {
+        "id": "ki-entwickler-koeln",
+        "fit_rating": 4,
+        "score": 64.8,
+        "predicted": 7,
+        "gold": 7,
+        "matched": 7,
+        "writer_rounds": 1,
+        "removed_sentences": 0,
+        "seconds": 0.24
+      }
+    ],
+    "retrieval_pairs": 40,
+    "retrieval_recall_at_1": 0.8,
+    "retrieval_recall_at_5": 0.85,
+    "retrieval_mrr": 0.825,
+    "retrieval_misses": [
+      "Experience with message queues",
+      "Built LLM applications grounded in company documents",
+      "Text classification with machine learning",
+      "Event-driven architecture",
+      "Asynchronous Python",
+      "AI features with measurable business impact"
+    ],
+    "fabrication_cases": 100,
+    "clean_cases": 50,
+    "fabrication_recall": 0.79,
+    "false_alarm_rate": 0.0,
+    "fabrication_by_config": [
+      {
+        "config": "No judge",
+        "label": "No judge",
+        "recall": 0.0,
+        "false_alarm_rate": 0.0
+      },
+      {
+        "config": "Citations only",
+        "label": "Citations only",
+        "recall": 0.0,
+        "false_alarm_rate": 0.0
+      },
+      {
+        "config": "Code checks (citations + numbers)",
+        "label": "Code checks\n(citations + numbers)",
+        "recall": 0.46,
+        "false_alarm_rate": 0.0
+      },
+      {
+        "config": "LLM judge only",
+        "label": "LLM judge only",
+        "recall": 0.33,
+        "false_alarm_rate": 0.0
+      },
+      {
+        "config": "Full (code + LLM judge)",
+        "label": "Full\n(code + LLM judge)",
+        "recall": 0.79,
+        "false_alarm_rate": 0.0
+      }
+    ],
+    "fabrication_recall_by_mutation": {
+      "fake_certification": 1.0,
+      "learning_to_production": 1.0,
+      "number_change": 1.0,
+      "outcome_invention": 1.0,
+      "scope_inflation": 0.0,
+      "seniority": 0.0,
+      "tool_injection": 1.0,
+      "years_claim": 1.0
+    },
+    "missed_fabrications": [
+      "As the lead architect, I built features from historical prices, holidays and weather data with pandas.",
+      "As the lead architect, I evaluated on 500 historical tickets: 68% of drafts were accepted with minor edits by support agents in a two-week pilot.",
+      "In my previous role, I led a team of engineers that migrated 12 batch ETL jobs from cron scripts to Apache Airflow, adding retries, alerting and data quality checks.",
+      "As the lead architect, I containerized all services with Docker and set up GitHub Actions pipelines for tests, linting and image builds.",
+      "Led a team of engineers that wrote integration tests with pytest and Testcontainers, raising backend test coverage from 41% to 78%.",
+      "As the lead architect, I built internal dashboards in React and TypeScript to visualize device health.",
+      "In my previous role, I led a team of engineers that deployed a small FastAPI app on a local kind cluster with a Deployment, Service and Ingress.",
+      "Led a team of engineers that compared ARIMA, gradient boosted trees (LightGBM) and a small LSTM in PyTorch.",
+      "In my previous role, I led a team of engineers that added a human approval step before any reply is sent, implemented with LangGraph interrupts.",
+      "As the lead architect, I migrated 12 batch ETL jobs from cron scripts to Apache Airflow, adding retries, alerting and data quality checks.",
+      "Led a team of engineers that developed REST APIs in Python (Django REST Framework) for a shipment tracking platform serving 1.2 million requests per day.",
+      "As the lead architect, I wrote integration tests with pytest and Testcontainers, raising backend test coverage from 41% to 78%.",
+      "In my previous role, I led a team of engineers that automated weekly reports with SQL and Jupyter notebooks.",
+      "As the lead architect, I deployed a small FastAPI app on a local kind cluster with a Deployment, Service and Ingress.",
+      "As the lead architect, I compared ARIMA, gradient boosted trees (LightGBM) and a small LSTM in PyTorch.",
+      "As the lead architect, I added a human approval step before any reply is sent, implemented with LangGraph interrupts.",
+      "Led a team of engineers that introduced structured logging and OpenTelemetry tracing across 8 Python microservices, reducing mean time to resolution for incidents from 3 hours to 45 minutes.",
+      "As the lead architect, I developed REST APIs in Python (Django REST Framework) for a shipment tracking platform serving 1.2 million requests per day.",
+      "In my previous role, I led a team of engineers that deployed services to AWS (ECS, RDS, S3) using Terraform.",
+      "As the lead architect, I automated weekly reports with SQL and Jupyter notebooks."
+    ],
+    "false_alarms": []
+  }
+}

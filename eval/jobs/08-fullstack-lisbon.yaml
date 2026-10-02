@@ -1,0 +1,27 @@
+id: fullstack-lisbon
+fit_rating: 3
+text: |
+  # Full-stack Engineer
+
+  Location: Lisbon, Portugal (remote)
+
+  Seabright makes booking software for surf schools.
+
+  ## Must have
+
+  - Experience building backend services in Python
+  - Experience with TypeScript and React
+  - Experience with PostgreSQL
+  - Experience with Docker
+
+  ## Nice to have
+
+  - Experience with AWS
+  - Experience with GraphQL
+gold:
+  - { text: "Experience building backend services in Python", importance: must }
+  - { text: "Experience with TypeScript and React", importance: must }
+  - { text: "Experience with PostgreSQL", importance: must }
+  - { text: "Experience with Docker", importance: must }
+  - { text: "Experience with AWS", importance: nice }
+  - { text: "Experience with GraphQL", importance: nice }
