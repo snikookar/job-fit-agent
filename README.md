@@ -11,7 +11,8 @@
 ![Next.js](https://img.shields.io/badge/UI-Next.js-000000?logo=nextdotjs&logoColor=white)
 ![Postgres](https://img.shields.io/badge/DB-Postgres%20%2B%20pgvector-4169E1?logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/run-Docker%20Compose-2496ED?logo=docker&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-50%20passing-brightgreen)
+![MCP](https://img.shields.io/badge/MCP-server-6E56CF)
+![Tests](https://img.shields.io/badge/tests-62%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 [How it works](#-how-it-works) ·
@@ -19,6 +20,7 @@
 [Fact-checking](#%EF%B8%8F-the-fact-check-three-layers-cheapest-first) ·
 [Results](#-results) ·
 [Quick start](#-quick-start) ·
+[MCP](#-use-it-from-claude-mcp) ·
 [Build log](#-how-this-was-built)
 
 </div>
@@ -418,8 +420,50 @@ uv run jobfit analyze --file tests/fixtures/ai_engineer_berlin.md --approve
 
 ```bash
 cd backend
-uv run pytest                   # 50 tests, no API keys needed
+uv run pytest                   # 62 tests, no API keys needed
 ```
+
+## 🔌 Use it from Claude (MCP)
+
+The backend includes a [Model Context Protocol](https://modelcontextprotocol.io) server, so Claude Code, Claude Desktop or any MCP client can use the agent's capabilities as tools. It runs over stdio (no open port) and uses the same database as the web app, so it sees the profile you built there.
+
+| Tool | What it does | Calls an LLM? |
+|---|---|---|
+| `search_profile` | Hybrid search (BM25 + dense + rerank) over your profile; returns chunk ids and text | no |
+| `score_job` | Requirements, evidence, fit score and gaps for a pasted posting (text only, no URLs) | yes |
+| `check_claim` | The three-layer fact-check on one sentence and the chunk ids it cites | judge only |
+| `list_tracker_cards` | Your application tracker, optionally filtered by status | no |
+
+All four tools are **read-only**: editing the profile, approving drafts and moving cards stay in the web app. The design choices (why read-only, why no URL input, how inputs are limited) are in [phase 11](docs/phases/11-mcp-server.md).
+
+First install the backend and load a profile (`cd backend && uv sync && uv run jobfit load-sample` for the demo). Then replace `/absolute/path/to/job-fit-agent` with the path of your clone:
+
+**Claude Code**
+
+```bash
+claude mcp add jobfit -- uv run --directory /absolute/path/to/job-fit-agent/backend jobfit-mcp
+```
+
+Run `claude mcp list` to check that it shows `jobfit: … - ✔ Connected`, then ask Claude something like *"Search my profile for Terraform experience"*.
+
+**Claude Desktop**
+
+Open *Settings → Developer → Edit Config* and add this to `claude_desktop_config.json`, then restart the app:
+
+```json
+{
+  "mcpServers": {
+    "jobfit": {
+      "command": "uv",
+      "args": ["run", "--directory", "/absolute/path/to/job-fit-agent/backend", "jobfit-mcp"]
+    }
+  }
+}
+```
+
+If Desktop can't find `uv`, use its full path as `command` (`which uv` on macOS/Linux, `where uv` on Windows). On Windows, write the path with forward slashes or escaped backslashes, for example `"C:/Users/you/job-fit-agent/backend"`.
+
+LLM keys come from the same `.env` as the web app. Without them, `score_job` and `check_claim` use the offline stand-ins and say so (`offline_mode: true`).
 
 ## ⚙️ Configuration
 
@@ -451,6 +495,7 @@ All settings are environment variables (see [`.env.example`](.env.example)):
 | Parsing | PyMuPDF (Docling optional), trafilatura, Playwright fallback | Fast by default, heavier tools only when needed |
 | Export | python-docx | Editable Word files, templates, evidence comments |
 | Eval | Custom script + planted fabrications | Ground truth without hand-labeling every sentence |
+| Agent interface | **MCP** (official Python SDK, stdio) | The same retrieval, scoring and fact-check as tools for Claude and other MCP clients; read-only |
 | Infra | Docker Compose, GitHub Actions | CI runs on SQLite **and** Postgres + pgvector |
 
 ### Continuous integration
@@ -475,9 +520,10 @@ backend/
     profile/      parsing (PDF/DOCX/MD), chunking, GitHub, ingestion
     retrieval/    embeddings, reranker, pgvector/NumPy store, hybrid search
     grounding.py  three-layer fact-check
+    mcp_server.py MCP server: the agent's tools for Claude and other MCP clients
     scoring.py    deterministic score
     export/       .docx
-  tests/          50 tests, no API keys needed
+  tests/          62 tests, no API keys needed
 frontend/         Next.js app
 eval/             labeled postings, retrieval pairs, fabrication set, run_eval.py
 sample_profile/   Mira Lindqvist, a fictional persona for demos and evals
@@ -486,14 +532,14 @@ docs/             SPEC.md and a write-up for each build phase
 
 ## 📚 How this was built
 
-The project was built in 10 phases. Each phase has a write-up covering the files created, the technology choices and the alternatives considered:
+The project was built in 11 phases. Each phase has a write-up covering the files created, the technology choices and the alternatives considered:
 
 ```mermaid
 timeline
     title Build phases
     Core : 1 Foundation : 2 Profile and retrieval : 3 LLM layer and job parsing
     Agent : 4 Matching, scoring, gaps : 5 Writer and grounding judge : 6 Graph, review, export
-    Product : 7 API and streaming : 8 Evaluation : 9 Frontend : 10 Docker, CI, release
+    Product : 7 API and streaming : 8 Evaluation : 9 Frontend : 10 Docker, CI, release : 11 MCP server
 ```
 
 1. [Foundation](docs/phases/01-foundation.md): uv, settings, schemas, SQLite/pgvector models, the fictional profile
@@ -506,6 +552,7 @@ timeline
 8. [Evaluation](docs/phases/08-evaluation.md): planted fabrications, ablation, honest limitations
 9. [Frontend](docs/phases/09-frontend.md): the five screens
 10. [Docker, CI, release](docs/phases/10-docker-ci-release.md)
+11. [MCP server](docs/phases/11-mcp-server.md): the agent's capabilities as read-only MCP tools, untrusted-input handling
 
 The full design is in [docs/SPEC.md](docs/SPEC.md).
 
