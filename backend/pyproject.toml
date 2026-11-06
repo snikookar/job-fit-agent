@@ -33,10 +33,13 @@ dependencies = [
     "rank-bm25>=0.2.2",
     # Export
     "python-docx>=1.1",
+    # MCP server (official Python SDK, v2 API)
+    "mcp>=2.3,<3",
 ]
 
 [project.scripts]
 jobfit = "jobfit.cli:main"
+jobfit-mcp = "jobfit.mcp_server:main"
 
 [project.optional-dependencies]
 # Real embeddings + reranker (bge-m3, bge-reranker-v2-m3). Pulls in PyTorch (~1-2 GB).
